@@ -1,4 +1,4 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad;
 
 public class StatusRoot {
     private StatusError status;

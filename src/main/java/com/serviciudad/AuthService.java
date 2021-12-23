@@ -1,6 +1,7 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad;
 
 
+import com.serviciudad.repository.AuthRepository;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,30 +28,40 @@ public final class AuthService {
     @Autowired
     private FacturaService facturaService;
 
+    @Autowired
+    private ErrorService errorService;
+
     public ClientResponse auth(FacturaRequest facturaRequest) {
         ClientResponse clientResponse = null;
+        SessionRequest sessionRequest;
+        WebClient webClient;
+        try {
+            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
 
-        WebClient webClient = WebClient.create("https://checkout-test.placetopay.com/api");
-
-        FacturaResponse facturaResponse = facturaService.consultaFactura(facturaRequest);
-        SessionRequest sessionRequest = new SessionRequest(
-                facturaResponse.getIdfactura(),
-                facturaResponse.getDescripcion() + " Pago de servicios",
-                facturaResponse.getTotalfactura());
+            FacturaResponse facturaResponse = facturaService.consultaFactura(facturaRequest);
+            sessionRequest = new SessionRequest(
+                    facturaResponse.getIdfactura(),
+                    facturaResponse.getDescripcion() + " Pago de servicios",
+                    facturaResponse.getTotalfactura());
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
 
         ClientRequest clientRequest = createRequest(sessionRequest);
 
 //        save(sessionRequest);
 
-        clientResponse = webClient.post()
-                .uri("/session")
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .body(Mono.just(clientRequest), ClientRequest.class)
-                .retrieve()
+        try {
+            clientResponse = webClient.post()
+                    .uri("/session")
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(clientRequest), ClientRequest.class)
+                    .retrieve()
 
-                .bodyToMono(ClientResponse.class)
-                .timeout(Duration.ofSeconds(20))  // timeout
-                .block();
+                    .bodyToMono(ClientResponse.class)
+                    .timeout(Duration.ofSeconds(20))  // timeout
+                    .block();
 /*
 
                 .onStatus(HttpStatus::is4xxClientError, response -> {
@@ -71,6 +82,11 @@ public final class AuthService {
                     });
                 })
  */
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
+
         return clientResponse;
     }
 /*
@@ -170,5 +186,9 @@ public final class AuthService {
 
     private Amount createAmount(long total) {
         return new Amount("COP", total);
+    }
+
+    public List<AuthModel> listar() {
+        return (List<AuthModel>) authRepository.findAll();
     }
 }

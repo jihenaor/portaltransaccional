@@ -1,4 +1,4 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad;
 
 public class FacturaResponse {
     private Integer CodRespuesta;

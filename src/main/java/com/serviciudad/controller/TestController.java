@@ -1,4 +1,4 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

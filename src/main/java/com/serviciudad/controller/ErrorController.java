@@ -1,23 +1,26 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad.controller;
 
-
+import com.serviciudad.ErrorService;
+import com.serviciudad.model.ErrorModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
-public final class AuthController {
+public final class ErrorController {
     @Autowired
-    private AuthService authService;
+    private ErrorService errorService;
 
-    @RequestMapping(value = "/session", method = RequestMethod.POST)
-    public ResponseEntity<ClientResponse> session(@RequestBody FacturaRequest facturaRequest) {
+    @RequestMapping(value = "/listarerrores", method = RequestMethod.GET)
+    public ResponseEntity<List<ErrorModel>> listar() {
+
         try {
-            return ResponseEntity.ok().body(authService.auth(facturaRequest));
+            return ResponseEntity.ok().body(errorService.listar());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body(null);

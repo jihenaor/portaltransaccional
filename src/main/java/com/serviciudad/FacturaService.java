@@ -1,4 +1,4 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -13,9 +13,6 @@ import java.util.*;
 
 @Service
 public final class FacturaService {
-    @Autowired
-    AuthRepository authRepository;
-
     public FacturaResponse consultaFactura(FacturaRequest facturaRequest) {
         WebClient webClient = WebClient.create("http://192.168.100.72:8080/recaudos/api");
 
@@ -29,7 +26,4 @@ public final class FacturaService {
                 .block();
     }
 
-    public List<AuthModel> listar() {
-        return (List<AuthModel>) authRepository.findAll();
-    }
 }

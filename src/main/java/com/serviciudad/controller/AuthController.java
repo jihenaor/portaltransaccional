@@ -1,5 +1,7 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad.controller;
 
+
+import com.serviciudad.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,26 +13,26 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public final class FacturaController {
+public final class AuthController {
     @Autowired
-    private FacturaService facturaService;
+    private AuthService authService;
 
-    @RequestMapping(value = "/consultafactura", method = RequestMethod.POST)
-    public ResponseEntity<FacturaResponse> consultafactura(@RequestBody FacturaRequest facturaRequest) {
 
+    @RequestMapping(value = "/session", method = RequestMethod.POST)
+    public ResponseEntity<ClientResponse> session(@RequestBody FacturaRequest facturaRequest) {
         try {
-            return ResponseEntity.ok().body(facturaService.consultaFactura(facturaRequest));
+            return ResponseEntity.ok().body(authService.auth(facturaRequest));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body(null);
         }
     }
 
-    @RequestMapping(value = "/listar", method = RequestMethod.GET)
+    @RequestMapping(value = "/listarsessiones", method = RequestMethod.GET)
     public ResponseEntity<List<AuthModel>> listar() {
 
         try {
-            return ResponseEntity.ok().body(facturaService.listar());
+            return ResponseEntity.ok().body(authService.listar());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body(null);

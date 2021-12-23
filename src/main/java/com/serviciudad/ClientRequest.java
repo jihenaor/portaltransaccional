@@ -1,4 +1,4 @@
-package com.serviciudad.portaltransaccional;
+package com.serviciudad;
 
 public class ClientRequest {
     private String locale;
@@ -9,8 +9,8 @@ public class ClientRequest {
     private String ipAddress;
     private String userAgent;
     
-	public ClientRequest(String locale, com.serviciudad.portaltransaccional.Auth auth, Payment payment,
-			String expiration, String returnUrl, String ipAddress, String userAgent) {
+	public ClientRequest(String locale, Auth auth, Payment payment,
+                         String expiration, String returnUrl, String ipAddress, String userAgent) {
 		super();
 		this.locale = locale;
 		this.auth = auth;
