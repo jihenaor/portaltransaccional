@@ -1,6 +1,7 @@
-package com.serviciudad;
+package com.serviciudad.service;
 
 
+import com.serviciudad.*;
 import com.serviciudad.repository.AuthRepository;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
