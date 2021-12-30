@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins  = {"https://cursos.seguridadallimite.com"} )
+@CrossOrigin(origins  = {"http://serviciudadpse.com"} )
 @RestController
 @RequestMapping("/api")
 public final class AuthController {
