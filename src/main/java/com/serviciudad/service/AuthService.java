@@ -51,7 +51,7 @@ public final class AuthService {
 
         ClientRequest clientRequest = createRequest(sessionRequest);
 
-//        save(sessionRequest);
+        save(sessionRequest);
 
         try {
             clientResponse = webClient.post()
@@ -90,15 +90,15 @@ public final class AuthService {
 
         return clientResponse;
     }
-/*
+
     private void save(SessionRequest sessionRequest) {
         authRepository.save(
-                new AuthModel(  null, sessionRequest.getReference(),
+                new AuthModel(  sessionRequest.getReference(),
                                 sessionRequest.getDescripcion(),
                                 sessionRequest.getTotal()
                 ));
     }
-*/
+
     public ClientRequest createRequest(SessionRequest sessionRequest) {
         String locale = "es_CO";
         String returnUrl = "http://serviciudadpse.com/portaltransaccional/#/finalizar";
