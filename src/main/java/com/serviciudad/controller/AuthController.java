@@ -18,7 +18,6 @@ public final class AuthController {
     @Autowired
     private AuthService authService;
 
-
     @RequestMapping(value = "/session", method = RequestMethod.POST)
     public ResponseEntity<ClientResponse> session(@RequestBody FacturaRequest facturaRequest) {
         try {

@@ -37,7 +37,7 @@ public final class AuthService {
         SessionRequest sessionRequest;
         WebClient webClient;
         try {
-            webClient = WebClient.create("http://serviciudadpse.com/portaltransaccional/finalizar");
+            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
 
             FacturaResponse facturaResponse = facturaService.consultaFactura(facturaRequest);
             sessionRequest = new SessionRequest(
@@ -101,7 +101,7 @@ public final class AuthService {
 */
     public ClientRequest createRequest(SessionRequest sessionRequest) {
         String locale = "es_CO";
-        String returnUrl = "https://dnetix.co/p2p/client";
+        String returnUrl = "http://serviciudadpse.com/portaltransaccional/#/finalizar";
         String ipAddress = "127.0.0.1";
         String userAgent = "PlacetoPay Sandbox";
 
