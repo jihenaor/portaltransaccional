@@ -6,6 +6,10 @@
  * Made By MaterializeCSS.com
  */
 
+ h4 {
+  font-size: 3vw;
+}
+
 .icon-block {
   padding: 0 15px;
 }
@@ -14,7 +18,7 @@
 }
 .servi1{ 
   color:  #0079ba;
-  font-size: 25px;
+  font-size: 3vw;
   padding: 0px 100px;
  }
 .servihe{

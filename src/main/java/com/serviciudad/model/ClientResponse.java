@@ -1,4 +1,4 @@
-package com.serviciudad;
+package com.serviciudad.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

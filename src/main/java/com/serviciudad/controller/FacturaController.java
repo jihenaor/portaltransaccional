@@ -1,7 +1,10 @@
 package com.serviciudad.controller;
 
-import com.serviciudad.*;
+import com.serviciudad.model.AuthModel;
+import com.serviciudad.model.FacturaRequest;
+import com.serviciudad.model.FacturaResponse;
 import com.serviciudad.service.AuthService;
+import com.serviciudad.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -1,6 +1,6 @@
 package com.serviciudad.controller;
 
-import com.serviciudad.ErrorService;
+import com.serviciudad.service.ErrorService;
 import com.serviciudad.model.ErrorModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

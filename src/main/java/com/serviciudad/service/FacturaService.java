@@ -1,6 +1,7 @@
-package com.serviciudad;
+package com.serviciudad.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.serviciudad.model.FacturaRequest;
+import com.serviciudad.model.FacturaResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,6 @@ import reactor.core.publisher.Mono;
 
 
 import java.time.Duration;
-import java.util.*;
 
 @Service
 public final class FacturaService {

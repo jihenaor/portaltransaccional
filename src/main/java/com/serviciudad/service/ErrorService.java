@@ -1,4 +1,4 @@
-package com.serviciudad;
+package com.serviciudad.service;
 
 
 import com.serviciudad.model.ErrorModel;

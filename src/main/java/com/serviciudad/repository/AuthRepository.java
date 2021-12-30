@@ -1,6 +1,6 @@
 package com.serviciudad.repository;
 
-import com.serviciudad.AuthModel;
+import com.serviciudad.model.AuthModel;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.serviciudad;
+package com.serviciudad.model;
 
 public class Auth{
     private String login;

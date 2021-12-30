@@ -1,7 +1,7 @@
 package com.serviciudad.service;
 
 
-import com.serviciudad.*;
+import com.serviciudad.model.*;
 import com.serviciudad.repository.AuthRepository;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public final class AuthService {
         SessionRequest sessionRequest;
         WebClient webClient;
         try {
-            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
+            webClient = WebClient.create("http://serviciudadpse.com/portaltransaccional/finalizar");
 
             FacturaResponse facturaResponse = facturaService.consultaFactura(facturaRequest);
             sessionRequest = new SessionRequest(
