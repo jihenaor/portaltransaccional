@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins  = {"http://serviciudadpse.com"} )
+@CrossOrigin(origins  = {"https://serviciudadpse.com", "https://serviciudad.gov.co"} )
 @RestController
 @RequestMapping("/api")
 public final class PagoController {
