@@ -33,25 +33,26 @@ public final class AuthService {
     private ErrorService errorService;
 
     public ClientResponse auth(FacturaRequest facturaRequest) {
-        ClientResponse clientResponse = null;
+        ClientResponse clientResponse;
         SessionRequest sessionRequest;
         WebClient webClient;
+        FacturaResponse facturaResponse;
+
         try {
             webClient = WebClient.create("https://checkout-test.placetopay.com/api");
-
-            FacturaResponse facturaResponse = facturaService.consultaFactura(facturaRequest);
-            sessionRequest = new SessionRequest(
-                    facturaResponse.getIdfactura(),
-                    facturaResponse.getDescripcion() + " Pago de servicios",
-                    facturaResponse.getTotalfactura());
         } catch (Exception e) {
             errorService.save(e);
             throw e;
         }
 
+        sessionRequest = getSessionRequest(facturaRequest);
+
         ClientRequest clientRequest = createRequest(sessionRequest);
 
-        save(sessionRequest);
+        sessionRequest.setLogin(clientRequest.getAuth().getLogin());
+        sessionRequest.setNonce(clientRequest.getAuth().getNonce());
+        sessionRequest.setTrankey(clientRequest.getAuth().getTranKey());
+        sessionRequest.setSeed(clientRequest.getAuth().getSeed());
 
         try {
             clientResponse = webClient.post()
@@ -63,45 +64,45 @@ public final class AuthService {
                     .bodyToMono(ClientResponse.class)
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
-/*
-
-                .onStatus(HttpStatus::is4xxClientError, response -> {
-                    Mono<String> errorMsg = response.bodyToMono(String.class);
-
-                    return errorMsg.flatMap(msg -> {
-                        ObjectMapper objectMapper = new ObjectMapper();
-
-                        try {
-                            System.out.println(msg);
-                            StatusRoot c = objectMapper.readValue(msg, StatusRoot.class);
-                            System.out.println(c);
-//                                return response.bodyToMono(ClientResponse.class);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        throw new RuntimeException(msg);
-                    });
-                })
- */
         } catch (Exception e) {
             errorService.save(e);
             throw e;
         }
 
+        save(sessionRequest, clientResponse.getRequestId());
+
         return clientResponse;
     }
 
-    private void save(SessionRequest sessionRequest) {
+    private SessionRequest getSessionRequest(FacturaRequest facturaRequest) {
+        FacturaResponse facturaResponse;
+        SessionRequest sessionRequest;
+        try {
+            facturaResponse = facturaService.consultaFactura(facturaRequest);
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
+
+        sessionRequest = new SessionRequest(
+                facturaRequest.getCodsuscrip(),
+                facturaResponse.getIdfactura(),
+                facturaResponse.getDescripcion() + " Pago de servicios",
+                facturaResponse.getTotalfactura()
+                );
+        return sessionRequest;
+    }
+
+    private void save(SessionRequest sessionRequest, int requestId) {
         authRepository.save(
-                new AuthModel(  sessionRequest.getReference(),
-                                sessionRequest.getDescripcion(),
-                                sessionRequest.getTotal()
-                ));
+                new AuthModel(sessionRequest, requestId));
     }
 
     public ClientRequest createRequest(SessionRequest sessionRequest) {
         String locale = "es_CO";
-        String returnUrl = "http://serviciudadpse.com/portaltransaccional/#/finalizar";
+        String returnUrl = "http://serviciudadpse.com/portaltransaccional/#/finalizar/"
+                + sessionRequest.getCuenta()
+                + "/" + sessionRequest.getReference();
         String ipAddress = "127.0.0.1";
         String userAgent = "PlacetoPay Sandbox";
 
@@ -137,15 +138,14 @@ public final class AuthService {
 
     public byte[] sha1(String toHash) {
         byte[] bytes = null;
-        try
-        {
+
+        try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
             bytes = toHash.getBytes(StandardCharsets.US_ASCII); //I tried UTF-8, ISO-8859-1...
             digest.update(bytes, 0, bytes.length);
             bytes = digest.digest();
         }
-        catch(NoSuchAlgorithmException e)
-        {
+        catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return bytes;

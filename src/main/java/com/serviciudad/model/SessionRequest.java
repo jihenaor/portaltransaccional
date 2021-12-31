@@ -1,25 +1,20 @@
 package com.serviciudad.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class SessionRequest {
-    private String reference;
-    private String descripcion;
-    private long total;
-    
-    public SessionRequest(String reference, String descripcion, long total) {
-		super();
-		this.reference = reference;
-		this.descripcion = descripcion;
-		this.total = total;
-	}
-	public String getReference() {
-		return reference;
-	}
-	public String getDescripcion() {
-		return descripcion;
-	}
-	public long getTotal() {
-		return total;
-	}
-
-
+	private final String cuenta;
+    private final String reference;
+    private final String descripcion;
+    private final long total;
+    private String login;
+    private String trankey;
+    private String nonce;
+    private String seed;
 }

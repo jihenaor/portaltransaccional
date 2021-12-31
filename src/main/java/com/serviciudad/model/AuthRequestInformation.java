@@ -9,10 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Auth{
-    private String login;
-    private String tranKey;
-    private String nonce;
-    private String seed;
-
+public class AuthRequestInformation {
+    private Auth auth;
 }
