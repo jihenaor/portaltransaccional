@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@CrossOrigin(origins  = {"http://serviciudadpse.com", "https://serviciudad.gov.co"} )
 @RestController
 @RequestMapping("/api")
 public final class ErrorController {
