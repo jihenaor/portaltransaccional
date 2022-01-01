@@ -5,6 +5,7 @@ import com.serviciudad.model.AuthModel;
 import com.serviciudad.model.ClientResponse;
 import com.serviciudad.model.FacturaRequest;
 import com.serviciudad.service.AuthService;
+import com.serviciudad.service.ErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,15 @@ public final class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private ErrorService errorService;
+
     @RequestMapping(value = "/session", method = RequestMethod.POST)
     public ResponseEntity<ClientResponse> session(@RequestBody FacturaRequest facturaRequest) {
         try {
             return ResponseEntity.ok().body(authService.auth(facturaRequest));
         } catch (Exception e) {
-            e.printStackTrace();
+            errorService.save(e);
             return ResponseEntity.internalServerError().body(null);
         }
     }
@@ -33,7 +37,7 @@ public final class AuthController {
         try {
             return ResponseEntity.ok().body(authService.listar());
         } catch (Exception e) {
-            e.printStackTrace();
+            errorService.save(e);
             return ResponseEntity.internalServerError().body(null);
         }
     }

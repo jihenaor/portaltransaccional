@@ -4,6 +4,7 @@ import com.serviciudad.model.AuthModel;
 import com.serviciudad.model.FacturaRequest;
 import com.serviciudad.model.FacturaResponse;
 import com.serviciudad.service.AuthService;
+import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,16 @@ public final class FacturaController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private ErrorService errorService;
+
     @RequestMapping(value = "/consultafactura", method = RequestMethod.POST)
     public ResponseEntity<FacturaResponse> consultafactura(@RequestBody FacturaRequest facturaRequest) {
 
         try {
             return ResponseEntity.ok().body(facturaService.consultaFactura(facturaRequest));
         } catch (Exception e) {
-            e.printStackTrace();
+            errorService.save(e);
             return ResponseEntity.internalServerError().body(null);
         }
     }
@@ -37,7 +41,7 @@ public final class FacturaController {
         try {
             return ResponseEntity.ok().body(authService.listar());
         } catch (Exception e) {
-            e.printStackTrace();
+            errorService.save(e);
             return ResponseEntity.internalServerError().body(null);
         }
     }
