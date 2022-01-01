@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -23,8 +24,10 @@ public final class ErrorModel {
     private String id;
     private String msg;
     private String error;
+    private Date fecha;
+    private String datos;
 
-    public ErrorModel(Exception e) {
+    public ErrorModel(Exception e, String datos) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
@@ -32,5 +35,7 @@ public final class ErrorModel {
         this.id = UUID.randomUUID().toString();
         this.msg = e.getMessage();
         this.error = sw.toString();
+        this.fecha = new Date();
+        this.datos = datos;
     }
 }

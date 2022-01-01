@@ -100,7 +100,7 @@ public final class AuthService {
 
     public ClientRequest createRequest(SessionRequest sessionRequest) {
         String locale = "es_CO";
-        String returnUrl = "http://serviciudadpse.com/portaltransaccional/#/finalizar/"
+        String returnUrl = "https://serviciudad.gov.co/apppse/#/finalizar/"
                 + sessionRequest.getCuenta()
                 + "/" + sessionRequest.getReference();
         String ipAddress = "127.0.0.1";

@@ -27,4 +27,16 @@ public final class ErrorController {
             return ResponseEntity.internalServerError().body(null);
         }
     }
+
+    @RequestMapping(value = "/borrarerrores", method = RequestMethod.GET)
+    public ResponseEntity<String> borrar() {
+
+        try {
+            errorService.borrar();
+            return ResponseEntity.ok().body("OK");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
 }

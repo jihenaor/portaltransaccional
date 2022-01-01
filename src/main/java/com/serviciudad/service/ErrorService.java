@@ -27,10 +27,18 @@ public final class ErrorService {
     ErrorRepository errorRepository;
 
     public void save(Exception e) {
-        errorRepository.save(new ErrorModel(e));
+        errorRepository.save(new ErrorModel(e, ""));
+    }
+
+    public void save(Exception e, String datos) {
+        errorRepository.save(new ErrorModel(e, datos));
     }
 
     public List<ErrorModel> listar() {
         return (List<ErrorModel>) errorRepository.findAll();
+    }
+
+    public void borrar() {
+        errorRepository.deleteAll();
     }
 }

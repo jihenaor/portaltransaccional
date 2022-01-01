@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AuthRepository extends CrudRepository<AuthModel, String> {
     AuthModel findByCuentaAndReference(String cuenta, String reference);
+
+//    delete
 }

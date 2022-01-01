@@ -1,6 +1,8 @@
 package com.serviciudad.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
@@ -52,6 +54,7 @@ public final class PagoService {
                                 authModel.getNonce(),
                                 authModel.getSeed())
                         );
+
         try {
             pagoResponse = webClient.post()
                     .uri("/session/" + authModel.getRequestid())
@@ -62,8 +65,16 @@ public final class PagoService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
-            errorService.save(e);
-            e.printStackTrace();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            try {
+                String aAsString = objectMapper.writeValueAsString(authRequestInformation);
+                errorService.save(e, aAsString);
+            } catch (JsonProcessingException exception) {
+                errorService.save(e);
+            }
+
             throw e;
         }
 
