@@ -94,6 +94,7 @@ public final class AuthService {
     }
 
     private void save(SessionRequest sessionRequest, int requestId) {
+        authRepository.delete(sessionRequest.getCuenta(), sessionRequest.getReference());
         authRepository.save(
                 new AuthModel(sessionRequest, requestId));
     }
