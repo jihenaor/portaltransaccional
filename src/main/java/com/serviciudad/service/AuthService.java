@@ -1,7 +1,10 @@
 package com.serviciudad.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.model.*;
+import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +35,14 @@ public final class AuthService {
     @Autowired
     private ErrorService errorService;
 
+
     public ClientResponse auth(FacturaRequest facturaRequest) {
         ClientResponse clientResponse;
         SessionRequest sessionRequest;
         WebClient webClient;
-        FacturaResponse facturaResponse;
+
+
+        sessionRequest = getSessionRequest(facturaRequest);
 
         try {
             webClient = WebClient.create("https://checkout-test.placetopay.com/api");
@@ -44,8 +50,6 @@ public final class AuthService {
             errorService.save(e);
             throw e;
         }
-
-        sessionRequest = getSessionRequest(facturaRequest);
 
         ClientRequest clientRequest = createRequest(sessionRequest);
 
@@ -94,9 +98,8 @@ public final class AuthService {
     }
 
     private void save(SessionRequest sessionRequest, int requestId) {
-        authRepository.delete(sessionRequest.getCuenta(), sessionRequest.getReference());
         authRepository.save(
-                new AuthModel(sessionRequest, requestId));
+                    new AuthModel(sessionRequest, requestId));
     }
 
     public ClientRequest createRequest(SessionRequest sessionRequest) {

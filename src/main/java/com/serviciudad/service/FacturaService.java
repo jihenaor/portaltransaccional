@@ -1,7 +1,11 @@
 package com.serviciudad.service;
 
-import com.serviciudad.model.FacturaRequest;
-import com.serviciudad.model.FacturaResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serviciudad.model.*;
+import com.serviciudad.modelpago.PagoResponse;
+import com.serviciudad.repository.AuthRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -13,17 +17,116 @@ import java.time.Duration;
 
 @Service
 public final class FacturaService {
+    @Autowired
+    AuthRepository authRepository;
+
+    @Autowired
+    AuthService authService;
+
+    @Autowired
+    private ErrorService errorService;
+
     public FacturaResponse consultaFactura(FacturaRequest facturaRequest) {
         WebClient webClient = WebClient.create("http://192.168.100.72:8080/recaudos/api");
+        FacturaResponse facturaResponse;
+        AuthModel authModel;
+        PagoResponse pagoResponse;
 
-        return webClient.post()
-                .uri("/rec")
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .body(Mono.just(facturaRequest), FacturaRequest.class)
-                .retrieve()
-                .bodyToMono(FacturaResponse.class)
-                .timeout(Duration.ofSeconds(20))  // timeout
-                .block();
+        try {
+            facturaResponse = webClient.post()
+                    .uri("/rec")
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(facturaRequest), FacturaRequest.class)
+                    .retrieve()
+                    .bodyToMono(FacturaResponse.class)
+                    .timeout(Duration.ofSeconds(20))  // timeout
+                    .block();
+
+            authModel = authRepository.findByCuentaAndReference(facturaResponse.getCuenta(), facturaResponse.getIdfactura());
+
+            if (authModel != null) {
+                pagoResponse = consultarEstadoPago(authModel);
+                facturaResponse.setStatus(pagoResponse.getStatus().getStatus());
+            }
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
+
+        return facturaResponse;
     }
 
+    public PagoResponse consultarEstadoPago(AuthModel authModel) {
+        PagoResponse pagoResponse;
+        WebClient webClient;
+
+        try {
+            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
+        AuthRequestInformation authRequestInformation = new AuthRequestInformation(
+                new Auth(authModel.getLogin(),
+                        authModel.getTrankey(),
+                        authModel.getNonce(),
+                        authModel.getSeed())
+        );
+
+        try {
+            pagoResponse = webClient.post()
+                    .uri("/session/" + authModel.getRequestid())
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(authRequestInformation), ClientRequest.class)
+                    .retrieve()
+                    .bodyToMono(PagoResponse.class)
+                    .timeout(Duration.ofSeconds(20))  // timeout
+                    .block();
+        } catch (Exception e) {
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            try {
+                String aAsString = objectMapper.writeValueAsString(authRequestInformation);
+                errorService.save(e, aAsString);
+            } catch (JsonProcessingException exception) {
+                errorService.save(e);
+            }
+
+            throw e;
+        }
+        return pagoResponse;
+    }
+
+
+    public PagoResponse pagarFactura(PagoRequest pagoRequest) {
+        PagoResponse pagoResponse;
+        WebClient webClient;
+
+        try {
+            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
+
+        AuthModel authModel = consulta(pagoRequest);
+
+        pagoResponse = consultarEstadoPago(authModel);
+
+//        update(sessionRequest, clientResponse.getRequestId());
+
+        return pagoResponse;
+    }
+
+
+
+    private void update(SessionRequest sessionRequest, int requestId) {
+        authRepository.save(
+                new AuthModel(sessionRequest, requestId));
+    }
+
+    public AuthModel consulta(PagoRequest pagoRequest) {
+        return authRepository.findByCuentaAndReference(pagoRequest.getCodsuscrip(), pagoRequest.getIdfactura());
+    }
 }

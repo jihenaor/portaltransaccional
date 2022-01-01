@@ -3,7 +3,7 @@ package com.serviciudad.controller;
 import com.serviciudad.model.PagoRequest;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.service.ErrorService;
-import com.serviciudad.service.PagoService;
+import com.serviciudad.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public final class PagoController {
     @Autowired
-    private PagoService pagoService;
+    private FacturaService facturaService;
 
     @Autowired
     private ErrorService errorService;
@@ -21,7 +21,7 @@ public final class PagoController {
     public ResponseEntity<PagoResponse> pagarfactura(@RequestBody PagoRequest pagoRequest) {
 
         try {
-            return ResponseEntity.ok().body(pagoService.pagarFactura(pagoRequest));
+            return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest));
         } catch (Exception e) {
             errorService.save(e);
             return ResponseEntity.internalServerError().body(null);

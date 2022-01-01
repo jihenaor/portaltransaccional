@@ -13,7 +13,4 @@ import java.util.List;
 public interface AuthRepository extends CrudRepository<AuthModel, String> {
     AuthModel findByCuentaAndReference(String cuenta, String reference);
 
-    @Modifying
-    @Query("delete from AuthModel b where b.cuenta = :cuenta and b.reference = :reference and estado = 'PROCESO'")
-    void delete(@Param("cuenta") String title, @Param("reference") String reference);
 }
