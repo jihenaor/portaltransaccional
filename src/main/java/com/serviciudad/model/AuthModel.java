@@ -39,7 +39,7 @@ public final class AuthModel {
 		this.descripcion = sessionRequest.getDescripcion();
 		this.total = sessionRequest.getTotal();
         this.fecha = new Date();
-        this.estado = "PROCESO";
+        this.estado = "PENDING";
         this.login = sessionRequest.getLogin();
         this.trankey = sessionRequest.getTrankey();
         this.nonce = sessionRequest.getNonce();

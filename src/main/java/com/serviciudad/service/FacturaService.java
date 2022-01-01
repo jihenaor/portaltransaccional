@@ -2,6 +2,7 @@ package com.serviciudad.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serviciudad.constantes.Constantes;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
@@ -19,9 +20,6 @@ import java.time.Duration;
 public final class FacturaService {
     @Autowired
     AuthRepository authRepository;
-
-    @Autowired
-    AuthService authService;
 
     @Autowired
     private ErrorService errorService;
@@ -42,11 +40,22 @@ public final class FacturaService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
 
-            authModel = authRepository.findByCuentaAndReference(facturaResponse.getCuenta(), facturaResponse.getIdfactura());
+            authModel = authRepository.findByCuentaAndReferenceEstado(
+                                                facturaResponse.getCuenta(),
+                                                facturaResponse.getIdfactura(),
+                                                Constantes.ESTADO_PENDIENTE);
 
             if (authModel != null) {
                 pagoResponse = consultarEstadoPago(authModel);
+
+                if (pagoResponse.getStatus().getStatus().equals(Constantes.ESTADO_PENDIENTE)) {
+                    authModel.setEstado(Constantes.ESTADO_CANCELADO);
+                    authRepository.save(authModel);
+                }
+
                 facturaResponse.setStatus(pagoResponse.getStatus().getStatus());
+            } else {
+                facturaResponse.setStatus("NOINICIADO");
             }
         } catch (Exception e) {
             errorService.save(e);
@@ -83,7 +92,6 @@ public final class FacturaService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
-
             ObjectMapper objectMapper = new ObjectMapper();
 
             try {
@@ -127,6 +135,6 @@ public final class FacturaService {
     }
 
     public AuthModel consulta(PagoRequest pagoRequest) {
-        return authRepository.findByCuentaAndReference(pagoRequest.getCodsuscrip(), pagoRequest.getIdfactura());
+        return authRepository.findByCuentaAndReferenceEstado(pagoRequest.getCodsuscrip(), pagoRequest.getIdfactura(), Constantes.ESTADO_PENDIENTE);
     }
 }
