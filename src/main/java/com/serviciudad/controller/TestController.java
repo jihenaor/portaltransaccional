@@ -13,7 +13,7 @@ public final class TestController {
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public ResponseEntity<HelloResponse> test() {
         try {
-            return ResponseEntity.ok().body(new HelloResponse("OK"));
+            return ResponseEntity.ok().body(new HelloResponse());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(null);
         }
