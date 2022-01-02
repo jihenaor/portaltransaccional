@@ -8,9 +8,11 @@ import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 
@@ -39,12 +41,20 @@ public final class FacturaService {
                     .bodyToMono(FacturaResponse.class)
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
+        } catch (Exception e) {
+            throw e;
+        }
 
+        try {
             authModel = authRepository.findByCuentaAndReferenceEstado(
                                                 facturaResponse.getCuenta(),
                                                 facturaResponse.getIdfactura(),
                                                 Constantes.ESTADO_PENDIENTE);
+        } catch (Exception e) {
+            throw e;
+        }
 
+        try {
             if (authModel != null) {
                 pagoResponse = consultarEstadoPago(authModel);
 
@@ -56,6 +66,14 @@ public final class FacturaService {
                 facturaResponse.setStatus(pagoResponse.getStatus().getStatus());
             } else {
                 facturaResponse.setStatus("NOINICIADO");
+            }
+        } catch (WebClientResponseException e) {
+            if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+                authModel.setEstado(Constantes.UNAUTHORIZED);
+                authRepository.save(authModel);
+                facturaResponse.setStatus("");
+            } else {
+                throw e;
             }
         } catch (Exception e) {
             errorService.save(e);
@@ -82,8 +100,7 @@ public final class FacturaService {
                         authModel.getSeed())
         );
 
-        try {
-            pagoResponse = webClient.post()
+        pagoResponse = webClient.post()
                     .uri("/session/" + authModel.getRequestid())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(authRequestInformation), ClientRequest.class)
@@ -91,18 +108,7 @@ public final class FacturaService {
                     .bodyToMono(PagoResponse.class)
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
-        } catch (Exception e) {
-            ObjectMapper objectMapper = new ObjectMapper();
 
-            try {
-                String aAsString = objectMapper.writeValueAsString(authRequestInformation);
-                errorService.save(e, aAsString);
-            } catch (JsonProcessingException exception) {
-                errorService.save(e);
-            }
-
-            throw e;
-        }
         return pagoResponse;
     }
 
