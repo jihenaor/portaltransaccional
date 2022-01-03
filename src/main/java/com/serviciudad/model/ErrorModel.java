@@ -24,10 +24,11 @@ public final class ErrorModel {
     private String id;
     private String msg;
     private String error;
-    private Date fecha;
+    private String fecha;
     private String datos;
+    private String origen;
 
-    public ErrorModel(Exception e, String datos) {
+    public ErrorModel(Exception e, String datos, String origen) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
@@ -35,7 +36,8 @@ public final class ErrorModel {
         this.id = UUID.randomUUID().toString();
         this.msg = e.getMessage();
         this.error = sw.toString();
-        this.fecha = new Date();
+        this.fecha = (new Date()).toString();
         this.datos = datos;
+        this.origen = origen;
     }
 }

@@ -3,6 +3,7 @@ package com.serviciudad.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
@@ -36,11 +37,10 @@ public final class AuthService {
     private ErrorService errorService;
 
 
-    public ClientResponse auth(FacturaRequest facturaRequest) {
+    public ClientResponse auth(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         ClientResponse clientResponse;
         SessionRequest sessionRequest;
         WebClient webClient;
-
 
         sessionRequest = getSessionRequest(facturaRequest);
 
@@ -78,11 +78,13 @@ public final class AuthService {
         return clientResponse;
     }
 
-    private SessionRequest getSessionRequest(FacturaRequest facturaRequest) {
+    private SessionRequest getSessionRequest(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         FacturaResponse facturaResponse;
         SessionRequest sessionRequest;
         try {
             facturaResponse = facturaService.consultaFactura(facturaRequest);
+        } catch (DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
+            throw domainExceptionCuentaNoExiste;
         } catch (Exception e) {
             errorService.save(e);
             throw e;

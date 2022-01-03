@@ -12,8 +12,11 @@ import java.util.List;
 @Repository
 public interface AuthRepository extends CrudRepository<AuthModel, String> {
 
-    @Query("Select b from AuthModel b where b.cuenta = :cuenta and b.reference = :reference and estado = :estado")
+    @Query("Select b from AuthModel b where b.cuenta = :cuenta and b.reference = :reference and b.estado = :estado")
     public AuthModel findByCuentaAndReferenceEstado(@Param("cuenta") String title,
                                   @Param("reference") String reference,
                                   @Param("estado") String estado);
+
+    @Query("Select b from AuthModel b where b.estado = :estado")
+    public List<AuthModel> findByEstado(@Param("estado") String estado);
 }

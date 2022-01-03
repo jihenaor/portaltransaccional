@@ -1,5 +1,6 @@
 package com.serviciudad.controller;
 
+import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.AuthModel;
 import com.serviciudad.model.FacturaRequest;
 import com.serviciudad.model.FacturaResponse;
@@ -29,8 +30,9 @@ public final class FacturaController {
 
         try {
             return ResponseEntity.ok().body(facturaService.consultaFactura(facturaRequest));
+        } catch (DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            errorService.save(e);
             return ResponseEntity.internalServerError().body(null);
         }
     }

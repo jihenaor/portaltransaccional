@@ -3,6 +3,7 @@ package com.serviciudad.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
+import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 public final class FacturaService {
@@ -26,7 +28,7 @@ public final class FacturaService {
     @Autowired
     private ErrorService errorService;
 
-    public FacturaResponse consultaFactura(FacturaRequest facturaRequest) {
+    public FacturaResponse consultaFactura(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         WebClient webClient = WebClient.create("http://192.168.100.72:8080/recaudos/api");
         FacturaResponse facturaResponse;
         AuthModel authModel;
@@ -42,7 +44,12 @@ public final class FacturaService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
+            errorService.save(e, "", "Consultando la factura");
             throw e;
+        }
+
+        if (facturaResponse.getCodRespuesta() == 1) {
+            throw new DomainExceptionCuentaNoExiste();
         }
 
         try {
@@ -133,8 +140,6 @@ public final class FacturaService {
         return pagoResponse;
     }
 
-
-
     private void update(SessionRequest sessionRequest, int requestId) {
         authRepository.save(
                 new AuthModel(sessionRequest, requestId));
@@ -142,5 +147,13 @@ public final class FacturaService {
 
     public AuthModel consulta(PagoRequest pagoRequest) {
         return authRepository.findByCuentaAndReferenceEstado(pagoRequest.getCodsuscrip(), pagoRequest.getIdfactura(), Constantes.ESTADO_PENDIENTE);
+    }
+
+    public void seleccionarPagosPendientes() {
+        List<AuthModel> authModels = authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
+        System.out.println(authModels.size());
+        authModels.forEach(authModel -> {
+            System.out.println(authModel.getLogin());
+        });
     }
 }
