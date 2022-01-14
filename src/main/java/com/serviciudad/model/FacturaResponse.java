@@ -14,4 +14,5 @@ public class FacturaResponse {
     private Long totalfactura;
     private String fechapago;
     private String status;
+    private String aplicado;
 }
