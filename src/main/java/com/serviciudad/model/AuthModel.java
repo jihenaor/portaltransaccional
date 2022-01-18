@@ -24,7 +24,7 @@ public final class AuthModel {
     private String reference;
     private String descripcion;
     private long total;
-    private Date fecha;
+    private String fecha;
     private String estado;
     private String login;
     private String trankey;
@@ -38,7 +38,7 @@ public final class AuthModel {
         this.reference = sessionRequest.getReference();
 		this.descripcion = sessionRequest.getDescripcion();
 		this.total = sessionRequest.getTotal();
-        this.fecha = new Date();
+        this.fecha = (new Date()).toString();
         this.estado = "PENDING";
         this.login = sessionRequest.getLogin();
         this.trankey = sessionRequest.getTrankey();

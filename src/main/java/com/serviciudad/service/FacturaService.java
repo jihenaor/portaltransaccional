@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 
 import java.time.Duration;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -94,7 +95,7 @@ public final class FacturaService {
     public PagoResponse consultarEstadoPago(AuthModel authModel) {
         PagoResponse pagoResponse;
         WebClient webClient;
-        String json = "";
+        String encodedString = "";
 
         try {
             webClient = WebClient.create("https://checkout-test.placetopay.com/api");
@@ -111,7 +112,8 @@ public final class FacturaService {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            json = mapper.writeValueAsString(authRequestInformation);
+            String json = mapper.writeValueAsString(authRequestInformation);
+            encodedString = Base64.getEncoder().encodeToString(json.getBytes());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -126,7 +128,7 @@ public final class FacturaService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
-            errorService.save(e, json, "consultarEstadoPago - " + "/session/" + authModel.getRequestid());
+            errorService.save(e, encodedString, "consultarEstadoPago");
             throw e;
         }
 
