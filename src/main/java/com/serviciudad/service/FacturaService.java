@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -107,7 +108,8 @@ public final class FacturaService {
                         authModel.getSeed())
         );
 
-        pagoResponse = webClient.post()
+        try {
+            pagoResponse = webClient.post()
                     .uri("/session/" + authModel.getRequestid())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(authRequestInformation), ClientRequest.class)
@@ -115,34 +117,30 @@ public final class FacturaService {
                     .bodyToMono(PagoResponse.class)
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
+        } catch (Exception e) {
+            errorService.save(e, "", "consultarEstadoPago");
+            throw e;
+        }
 
         return pagoResponse;
     }
 
-
     public PagoResponse pagarFactura(PagoRequest pagoRequest) {
         PagoResponse pagoResponse;
-        WebClient webClient;
-
-        try {
-            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
-        } catch (Exception e) {
-            errorService.save(e);
-            throw e;
-        }
 
         AuthModel authModel = consulta(pagoRequest);
 
         pagoResponse = consultarEstadoPago(authModel);
 
-//        update(sessionRequest, clientResponse.getRequestId());
-
+        if (!"PENDING".equals(pagoResponse.getStatus())) {
+            authModel.setEstado(pagoResponse.getStatus().getStatus());
+            update(authModel);
+        }
         return pagoResponse;
     }
 
-    private void update(SessionRequest sessionRequest, int requestId) {
-        authRepository.save(
-                new AuthModel(sessionRequest, requestId));
+    private void update(AuthModel authModel) {
+        authRepository.save(authModel);
     }
 
     public AuthModel consulta(PagoRequest pagoRequest) {
@@ -151,9 +149,10 @@ public final class FacturaService {
 
     public void seleccionarPagosPendientes() {
         List<AuthModel> authModels = authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
-        System.out.println(authModels.size());
+
         authModels.forEach(authModel -> {
-            System.out.println(authModel.getLogin());
+            PagoRequest pagoRequest = new PagoRequest(authModel.getCuenta(), authModel.getReference());
+            pagarFactura(pagoRequest);
         });
     }
 }

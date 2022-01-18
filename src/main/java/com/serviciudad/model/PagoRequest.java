@@ -1,8 +1,8 @@
 package com.serviciudad.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@AllArgsConstructor
 @Getter
 @Setter
 public class PagoRequest {
