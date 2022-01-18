@@ -66,7 +66,7 @@ public final class FacturaService {
             if (authModel != null) {
                 pagoResponse = consultarEstadoPago(authModel);
 
-                if (pagoResponse.getStatus().getStatus().equals(Constantes.ESTADO_PENDIENTE)) {
+                if (Constantes.ESTADO_PENDIENTE.equals(pagoResponse.getStatus().getStatus())) {
                     authModel.setEstado(Constantes.ESTADO_CANCELADO);
                     authRepository.save(authModel);
                 }
@@ -94,6 +94,7 @@ public final class FacturaService {
     public PagoResponse consultarEstadoPago(AuthModel authModel) {
         PagoResponse pagoResponse;
         WebClient webClient;
+        String json = "";
 
         try {
             webClient = WebClient.create("https://checkout-test.placetopay.com/api");
@@ -108,6 +109,13 @@ public final class FacturaService {
                         authModel.getSeed())
         );
 
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            json = mapper.writeValueAsString(authRequestInformation);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         try {
             pagoResponse = webClient.post()
                     .uri("/session/" + authModel.getRequestid())
@@ -118,7 +126,7 @@ public final class FacturaService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
-            errorService.save(e, "", "consultarEstadoPago");
+            errorService.save(e, json, "consultarEstadoPago - " + "/session/" + authModel.getRequestid());
             throw e;
         }
 
