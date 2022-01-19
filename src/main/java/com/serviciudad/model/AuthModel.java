@@ -32,8 +32,8 @@ public final class AuthModel {
     private String seed;
     private int requestid;
 
-    public AuthModel(SessionRequest sessionRequest, int requestid) {
-		this.id = UUID.randomUUID().toString();
+    public AuthModel(SessionRequest sessionRequest, int requestid, String id) {
+		this.id = id;
 		this.cuenta = sessionRequest.getCuenta();
         this.reference = sessionRequest.getReference();
 		this.descripcion = sessionRequest.getDescripcion();

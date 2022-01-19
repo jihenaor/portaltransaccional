@@ -3,9 +3,9 @@ package com.serviciudad.model;
 import lombok.*;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class PagoRequest {
-    private String codsuscrip;
-    private String idfactura;
+    private String id;
 }

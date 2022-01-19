@@ -36,6 +36,7 @@ public final class AuthService {
     @Autowired
     private ErrorService errorService;
 
+    private String id;
 
     public ClientResponse auth(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         ClientResponse clientResponse;
@@ -101,14 +102,14 @@ public final class AuthService {
 
     private void save(SessionRequest sessionRequest, int requestId) {
         authRepository.save(
-                    new AuthModel(sessionRequest, requestId));
+                    new AuthModel(sessionRequest, requestId, id));
     }
 
     public ClientRequest createRequest(SessionRequest sessionRequest) {
         String locale = "es_CO";
+        id = UUID.randomUUID().toString();
         String returnUrl = "https://serviciudad.gov.co/apppse/#/finalizar/"
-                + sessionRequest.getCuenta()
-                + "/" + sessionRequest.getReference();
+                + id;
         String ipAddress = "127.0.0.1";
         String userAgent = "PlacetoPay Sandbox";
 

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -55,24 +54,25 @@ public final class FacturaService {
         }
 
         try {
-            authModel = authRepository.findByCuentaAndReferenceEstado(
+            authModel = authRepository.findByCuentaAndReference(
                                                 facturaResponse.getCuenta(),
-                                                facturaResponse.getIdfactura(),
-                                                Constantes.ESTADO_PENDIENTE);
+                                                facturaResponse.getIdfactura());
         } catch (Exception e) {
             throw e;
         }
 
         try {
             if (authModel != null) {
-                pagoResponse = consultarEstadoPago(authModel);
-
-                if (Constantes.ESTADO_PENDIENTE.equals(pagoResponse.getStatus().getStatus())) {
-                    authModel.setEstado(Constantes.ESTADO_CANCELADO);
-                    authRepository.save(authModel);
+                if (Constantes.ESTADO_PENDIENTE.equals(authModel.getEstado())) {
+                    pagoResponse = consultarEstadoPago(authModel);
+                    if (!pagoResponse.getStatus().getStatus().equals(authModel.getEstado())) {
+                        authModel.setEstado(pagoResponse.getStatus().getStatus());
+                        authRepository.save(authModel);
+                    }
+                    facturaResponse.setStatus(pagoResponse.getStatus().getStatus());
+                } else {
+                    facturaResponse.setStatus(authModel.getEstado());
                 }
-
-                facturaResponse.setStatus(pagoResponse.getStatus().getStatus());
             } else {
                 facturaResponse.setStatus("NOINICIADO");
             }
@@ -95,7 +95,7 @@ public final class FacturaService {
     public PagoResponse consultarEstadoPago(AuthModel authModel) {
         PagoResponse pagoResponse;
         WebClient webClient;
-        String encodedString = "";
+        String json = "";
 
         try {
             webClient = WebClient.create("https://checkout-test.placetopay.com/api");
@@ -112,8 +112,8 @@ public final class FacturaService {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            String json = mapper.writeValueAsString(authRequestInformation);
-            encodedString = Base64.getEncoder().encodeToString(json.getBytes());
+            json = mapper.writeValueAsString(authRequestInformation);
+//            encodedString = Base64.getEncoder().encodeToString(json.getBytes());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -128,7 +128,7 @@ public final class FacturaService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
-            errorService.save(e, encodedString, "consultarEstadoPago");
+            errorService.save(e, json, "consultarEstadoPago");
             throw e;
         }
 
@@ -140,9 +140,13 @@ public final class FacturaService {
 
         AuthModel authModel = consulta(pagoRequest);
 
+        if (authModel == null) {
+
+        }
+
         pagoResponse = consultarEstadoPago(authModel);
 
-        if (!"PENDING".equals(pagoResponse.getStatus())) {
+        if (!authModel.getEstado().equals(pagoResponse.getStatus().getStatus())) {
             authModel.setEstado(pagoResponse.getStatus().getStatus());
             update(authModel);
         }
@@ -154,14 +158,14 @@ public final class FacturaService {
     }
 
     public AuthModel consulta(PagoRequest pagoRequest) {
-        return authRepository.findByCuentaAndReferenceEstado(pagoRequest.getCodsuscrip(), pagoRequest.getIdfactura(), Constantes.ESTADO_PENDIENTE);
+        return authRepository.findByiD(pagoRequest.getId());
     }
 
     public void seleccionarPagosPendientes() {
         List<AuthModel> authModels = authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
 
         authModels.forEach(authModel -> {
-            PagoRequest pagoRequest = new PagoRequest(authModel.getCuenta(), authModel.getReference());
+            PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             pagarFactura(pagoRequest);
         });
     }
