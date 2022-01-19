@@ -31,6 +31,7 @@ public final class AuthModel {
     private String nonce;
     private String seed;
     private int requestid;
+    private String fechaultimointento;
 
     public AuthModel(SessionRequest sessionRequest, int requestid, String id) {
 		this.id = id;

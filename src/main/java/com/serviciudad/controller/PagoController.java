@@ -21,7 +21,7 @@ public final class PagoController {
     public ResponseEntity<PagoResponse> pagarfactura(@RequestBody PagoRequest pagoRequest) {
 
         try {
-            return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest));
+            return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest, false));
         } catch (Exception e) {
             errorService.save(e);
             return ResponseEntity.internalServerError().body(null);

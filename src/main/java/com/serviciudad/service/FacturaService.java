@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -135,7 +136,7 @@ public final class FacturaService {
         return pagoResponse;
     }
 
-    public PagoResponse pagarFactura(PagoRequest pagoRequest) {
+    public PagoResponse pagarFactura(PagoRequest pagoRequest, boolean porCron) {
         PagoResponse pagoResponse;
 
         AuthModel authModel = consulta(pagoRequest);
@@ -149,6 +150,10 @@ public final class FacturaService {
         if (!authModel.getEstado().equals(pagoResponse.getStatus().getStatus())) {
             authModel.setEstado(pagoResponse.getStatus().getStatus());
             update(authModel);
+        } else {
+            if (porCron) {
+                authModel.setFechaultimointento((new Date()).toString());
+            }
         }
         return pagoResponse;
     }
@@ -166,7 +171,7 @@ public final class FacturaService {
 
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
-            pagarFactura(pagoRequest);
+            pagarFactura(pagoRequest, true);
         });
     }
 }
