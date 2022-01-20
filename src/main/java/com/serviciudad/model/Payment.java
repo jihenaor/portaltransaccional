@@ -1,7 +1,5 @@
 package com.serviciudad.model;
 
-import com.serviciudad.model.Amount;
-
 public class Payment{
     private String reference;
     private String description;

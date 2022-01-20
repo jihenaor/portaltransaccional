@@ -3,10 +3,13 @@ package com.serviciudad.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
+import com.serviciudad.entity.AuthModel;
+import com.serviciudad.entity.CronModel;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
+import com.serviciudad.repository.CronRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,14 +21,18 @@ import reactor.core.publisher.Mono;
 
 
 import java.time.Duration;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public final class FacturaService {
     @Autowired
     AuthRepository authRepository;
+
+
+    @Autowired
+    CronRepository cronRepository;
 
     @Autowired
     private ErrorService errorService;
@@ -145,16 +152,27 @@ public final class FacturaService {
 
         }
 
-        pagoResponse = consultarEstadoPago(authModel);
+        try {
+            pagoResponse = consultarEstadoPago(authModel);
 
-        if (!authModel.getEstado().equals(pagoResponse.getStatus().getStatus())) {
-            authModel.setEstado(pagoResponse.getStatus().getStatus());
-            update(authModel);
-        } else {
-            if (porCron) {
-                authModel.setFechaultimointento((new Date()).toString());
+            if (!authModel.getEstado().equals(pagoResponse.getStatus().getStatus())) {
+                authModel.setEstado(pagoResponse.getStatus().getStatus());
+                authModel.setAutorizacion(pagoResponse.getRequest().getPayment().getAuthorization());
+                update(authModel);
+            } else {
+                if (porCron) {
+                    authModel.setFechaultimointento((new Date()).toString());
+                }
             }
+        } catch (Exception e) {
+            if (e instanceof WebClientResponseException.Unauthorized) {
+                authModel.setEstado("UNAUTHORIZED");
+                authModel.setFechaultimointento((new Date()).toString());
+                update(authModel);
+            }
+            throw e;
         }
+
         return pagoResponse;
     }
 
@@ -169,9 +187,15 @@ public final class FacturaService {
     public void seleccionarPagosPendientes() {
         List<AuthModel> authModels = authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
 
+//        cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), authModels.size()));
+
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
-            pagarFactura(pagoRequest, true);
+            try {
+                pagarFactura(pagoRequest, true);
+            } catch (Exception e) {
+
+            }
         });
     }
 }

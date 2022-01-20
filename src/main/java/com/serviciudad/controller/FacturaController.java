@@ -1,7 +1,7 @@
 package com.serviciudad.controller;
 
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
-import com.serviciudad.model.AuthModel;
+import com.serviciudad.entity.AuthModel;
 import com.serviciudad.model.FacturaRequest;
 import com.serviciudad.model.FacturaResponse;
 import com.serviciudad.service.AuthService;

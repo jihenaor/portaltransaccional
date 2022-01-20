@@ -1,7 +1,8 @@
-package com.serviciudad.model;
+package com.serviciudad.entity;
 
 
 
+import com.serviciudad.model.SessionRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,6 +32,7 @@ public final class AuthModel {
     private String nonce;
     private String seed;
     private int requestid;
+    private String autorizacion;
     private String fechaultimointento;
 
     public AuthModel(SessionRequest sessionRequest, int requestid, String id) {

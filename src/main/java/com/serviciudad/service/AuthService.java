@@ -1,11 +1,9 @@
 package com.serviciudad.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serviciudad.entity.AuthModel;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
-import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.repository.AuthRepository;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;

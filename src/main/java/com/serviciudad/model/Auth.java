@@ -14,5 +14,4 @@ public class Auth{
     private String tranKey;
     private String nonce;
     private String seed;
-
 }
