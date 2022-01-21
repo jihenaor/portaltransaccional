@@ -2,6 +2,7 @@ package com.serviciudad.controller;
 
 import com.serviciudad.model.PagoRequest;
 import com.serviciudad.modelpago.PagoResponse;
+import com.serviciudad.modelpago.RespuestaResponse;
 import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public final class PagoController {
     private ErrorService errorService;
 
     @RequestMapping(value = "/pagarfactura", method = RequestMethod.POST)
-    public ResponseEntity<PagoResponse> pagarfactura(@RequestBody PagoRequest pagoRequest) {
+    public ResponseEntity<RespuestaResponse> pagarfactura(@RequestBody PagoRequest pagoRequest) {
 
         try {
             return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest, false));

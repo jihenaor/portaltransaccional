@@ -29,13 +29,20 @@ public final class ErrorModel {
     private String origen;
 
     public ErrorModel(Exception e, String datos, String origen) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
+        String errorTrace = "";
+        String mensaje = "";
+        if (e != null) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            errorTrace = sw.toString();
+
+            mensaje = e.getMessage();
+        }
 
         this.id = UUID.randomUUID().toString();
-        this.msg = e.getMessage();
-        this.error = sw.toString();
+        this.msg = mensaje;
+        this.error = errorTrace;
         this.fecha = (new Date()).toString();
         this.datos = datos;
         this.origen = origen;

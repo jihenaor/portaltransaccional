@@ -34,6 +34,10 @@ public final class ErrorService {
         errorRepository.save(new ErrorModel(e, datos, origen));
     }
 
+    public void save(String datos, String origen) {
+        errorRepository.save(new ErrorModel(null, datos, origen));
+    }
+
     public List<ErrorModel> listar() {
         return (List<ErrorModel>) errorRepository.findAll();
     }

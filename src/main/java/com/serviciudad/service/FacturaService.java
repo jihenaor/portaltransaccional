@@ -8,6 +8,7 @@ import com.serviciudad.entity.CronModel;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
+import com.serviciudad.modelpago.RespuestaResponse;
 import com.serviciudad.repository.AuthRepository;
 import com.serviciudad.repository.CronRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,9 +144,9 @@ public final class FacturaService {
         return pagoResponse;
     }
 
-    public PagoResponse pagarFactura(PagoRequest pagoRequest, boolean porCron) {
+    public RespuestaResponse pagarFactura(PagoRequest pagoRequest, boolean porCron) {
         PagoResponse pagoResponse;
-
+        RespuestaResponse respuestaResponse;
         AuthModel authModel = consulta(pagoRequest);
 
         if (authModel == null) {
@@ -173,7 +174,28 @@ public final class FacturaService {
             throw e;
         }
 
-        return pagoResponse;
+        String status;
+
+        switch (pagoResponse.getStatus().getStatus()) {
+            case "APPROVED":
+                status = "APROBADO";
+                break;
+            case "REJECTED":
+                status = "RECHAZADO";
+                break;
+            default:
+                status = pagoResponse.getStatus().getStatus();
+        }
+
+        respuestaResponse = new RespuestaResponse(pagoResponse.getStatus().getDate(),
+                pagoResponse.getRequest().getPayment().getAmount().currency,
+                String.valueOf(pagoResponse.getRequest().getPayment().getAmount().total),
+                pagoResponse.getPayment().get(0).getAuthorization(),
+                status,
+                pagoResponse.getStatus().getMessage());
+
+
+        return respuestaResponse;
     }
 
     private void update(AuthModel authModel) {

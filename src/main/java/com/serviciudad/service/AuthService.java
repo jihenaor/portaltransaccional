@@ -1,18 +1,23 @@
 package com.serviciudad.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.entity.AuthModel;
+import com.serviciudad.exception.DomainExceptionPlaceToPay;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
 import com.serviciudad.repository.AuthRepository;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
@@ -34,12 +39,16 @@ public final class AuthService {
     @Autowired
     private ErrorService errorService;
 
+    @Autowired
+    private Environment env;
+
     private String id;
 
-    public ClientResponse auth(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
+    public ClientResponse auth(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste, DomainExceptionPlaceToPay {
         ClientResponse clientResponse;
         SessionRequest sessionRequest;
         WebClient webClient;
+        String json = "";
 
         sessionRequest = getSessionRequest(facturaRequest);
 
@@ -57,6 +66,14 @@ public final class AuthService {
         sessionRequest.setTrankey(clientRequest.getAuth().getTranKey());
         sessionRequest.setSeed(clientRequest.getAuth().getSeed());
 
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            json = mapper.writeValueAsString(clientRequest);
+//            encodedString = Base64.getEncoder().encodeToString(json.getBytes());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         try {
             clientResponse = webClient.post()
                     .uri("/session")
@@ -68,8 +85,12 @@ public final class AuthService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
-            errorService.save(e);
-            throw e;
+            if (e instanceof WebClientResponseException.Unauthorized) {
+                errorService.save(json, "auth");
+            } else {
+                errorService.save(e);
+            }
+            throw new DomainExceptionPlaceToPay();
         }
 
         save(sessionRequest, clientResponse.getRequestId());
@@ -168,8 +189,8 @@ public final class AuthService {
     }
 
     private Auth createAuth()  {
-        String login = "30d07df739dc0667bbdd7c89fc654597";
-        String secrete = "juL6nhF30Ve5GX4G";
+        String login = env.getProperty("login");
+        String secrete =  env.getProperty("secrete");
         String seed = getSeed();
         String nonce = bin2String(randomBytes());
 
