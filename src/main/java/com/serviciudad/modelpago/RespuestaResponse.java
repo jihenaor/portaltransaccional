@@ -14,7 +14,7 @@ public class RespuestaResponse {
     private final String date;
     private final String currency;
     private final String total;
-    private final String cus;
+    private final String reference;
     private final String status;
     private final String message;
 }
