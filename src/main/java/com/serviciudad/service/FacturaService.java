@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
-import com.serviciudad.entity.CronModel;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
+import com.serviciudad.exception.DomainExceptionNoEncontradoRequestId;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.modelpago.RespuestaResponse;
@@ -24,7 +24,6 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public final class FacturaService {
@@ -206,6 +205,10 @@ public final class FacturaService {
         return authRepository.findByiD(pagoRequest.getId());
     }
 
+    public AuthModel consultaByRequestidAndReference(NotificacionRequest notificacionRequest) {
+        return authRepository.findByRequestidAndReference(notificacionRequest.getRequestID(), notificacionRequest.getReference());
+    }
+
     public void seleccionarPagosPendientes() {
         List<AuthModel> authModels = authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
 
@@ -219,5 +222,35 @@ public final class FacturaService {
 
             }
         });
+    }
+
+    public void notificarTransaccion(NotificacionRequest notificacionRequest) throws DomainExceptionNoEncontradoRequestId {
+        PagoResponse pagoResponse;
+        AuthModel authModel = consultaByRequestidAndReference(notificacionRequest);
+
+        if (authModel == null) {
+            throw new DomainExceptionNoEncontradoRequestId();
+        }
+
+        if (!authModel.getEstado().equals(Constantes.ESTADO_PENDIENTE)) {
+            return;
+        }
+
+        try {
+            pagoResponse = consultarEstadoPago(authModel);
+
+            if (!authModel.getEstado().equals(pagoResponse.getStatus().getStatus())) {
+                authModel.setEstado(pagoResponse.getStatus().getStatus());
+                authModel.setAutorizacion(pagoResponse.getRequest().getPayment().getAuthorization());
+                update(authModel);
+            }
+        } catch (Exception e) {
+            if (e instanceof WebClientResponseException.Unauthorized) {
+                authModel.setEstado(Constantes.UNAUTHORIZED);
+                authModel.setFechaultimointento((new Date()).toString());
+                update(authModel);
+            }
+            throw e;
+        }
     }
 }

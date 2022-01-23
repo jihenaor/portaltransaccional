@@ -20,7 +20,6 @@ public final class PagoController {
 
     @RequestMapping(value = "/pagarfactura", method = RequestMethod.POST)
     public ResponseEntity<RespuestaResponse> pagarfactura(@RequestBody PagoRequest pagoRequest) {
-
         try {
             return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest, false));
         } catch (Exception e) {
