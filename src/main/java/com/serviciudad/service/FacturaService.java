@@ -189,7 +189,7 @@ public final class FacturaService {
         respuestaResponse = new RespuestaResponse(pagoResponse.getStatus().getDate(),
                 pagoResponse.getRequest().getPayment().getAmount().currency,
                 String.valueOf(pagoResponse.getRequest().getPayment().getAmount().total),
-                pagoResponse.getPayment().get(0).getReference(),
+                pagoResponse.getPayment() == null ? authModel.getReference() : pagoResponse.getPayment().get(0).getReference(),
                 status,
                 pagoResponse.getStatus().getMessage());
 
