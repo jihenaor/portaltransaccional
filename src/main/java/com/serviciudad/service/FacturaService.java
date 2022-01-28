@@ -192,7 +192,7 @@ public final class FacturaService {
                 pagoResponse.getPayment() == null ? authModel.getReference() : pagoResponse.getPayment().get(0).getReference(),
                 status,
                 pagoResponse.getStatus().getMessage(),
-                pagoResponse.getRequest().getPayment().getAuthorization(),
+                authModel.getAutorizacion(),
                 authModel.getCuenta());
 
 
