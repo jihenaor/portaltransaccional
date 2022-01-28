@@ -65,7 +65,7 @@ public final class AuthService {
         sessionRequest.setNonce(clientRequest.getAuth().getNonce());
         sessionRequest.setTrankey(clientRequest.getAuth().getTranKey());
         sessionRequest.setSeed(clientRequest.getAuth().getSeed());
-
+        
         ObjectMapper mapper = new ObjectMapper();
         try {
             json = mapper.writeValueAsString(clientRequest);

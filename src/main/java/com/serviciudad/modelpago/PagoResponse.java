@@ -13,6 +13,6 @@ public class PagoResponse {
     private int requestId;
     private Status status;
     private Request request;
-    private List<Payment> payment;
+    private List<PaymentPago> payment;
     private Object subscription;
 }

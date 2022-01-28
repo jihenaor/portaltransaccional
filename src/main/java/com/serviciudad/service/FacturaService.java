@@ -191,7 +191,9 @@ public final class FacturaService {
                 String.valueOf(pagoResponse.getRequest().getPayment().getAmount().total),
                 pagoResponse.getPayment() == null ? authModel.getReference() : pagoResponse.getPayment().get(0).getReference(),
                 status,
-                pagoResponse.getStatus().getMessage());
+                pagoResponse.getStatus().getMessage(),
+                pagoResponse.getRequest().getPayment().getAuthorization(),
+                authModel.getCuenta());
 
 
         return respuestaResponse;

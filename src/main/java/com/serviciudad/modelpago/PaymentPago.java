@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public final class Payment{
+public final class PaymentPago {
     private String reference;
     private String description;
     private Amount amount;

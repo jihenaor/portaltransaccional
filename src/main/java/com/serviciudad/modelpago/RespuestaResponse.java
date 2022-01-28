@@ -17,4 +17,6 @@ public class RespuestaResponse {
     private final String reference;
     private final String status;
     private final String message;
+    private final String authorization;
+    private final String cuenta;
 }

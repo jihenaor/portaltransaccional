@@ -1,5 +1,6 @@
 package com.serviciudad.model;
 
+import com.serviciudad.modelpago.PaymentPago;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
