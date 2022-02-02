@@ -14,7 +14,7 @@ public class ScheduledFixedRateExample {
 
     @Scheduled(cron = "0 */2 * * * *")
     public void scheduleFixedRateTaskAsync()  {
-        facturaService.seleccionarPagosPendientes();
+        // facturaService.seleccionarPagosPendientes();
     }
 
 }

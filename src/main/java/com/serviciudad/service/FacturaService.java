@@ -25,6 +25,10 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
+
+//Tarjeta de prueba 4005580000000040
+//
+
 @Service
 public final class FacturaService {
     @Autowired
@@ -147,7 +151,7 @@ public final class FacturaService {
         PagoResponse pagoResponse;
         RespuestaResponse respuestaResponse;
         AuthModel authModel = consulta(pagoRequest);
-
+        String motivo;
         if (authModel == null) {
 
         }
