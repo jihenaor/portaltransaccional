@@ -157,7 +157,10 @@ public final class FacturaService {
 
             if (!authModel.getEstado().equals(pagoResponse.getStatus().getStatus())) {
                 authModel.setEstado(pagoResponse.getStatus().getStatus());
-                authModel.setAutorizacion(pagoResponse.getPayment().get(0).getAuthorization());
+                if (pagoResponse.getPayment() != null && pagoResponse.getPayment().get(0) != null) {
+                    authModel.setAutorizacion(pagoResponse.getPayment().get(0).getAuthorization());
+                }
+
                 update(authModel);
             } else {
                 if (porCron) {
