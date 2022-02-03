@@ -40,7 +40,8 @@ public final class AuthService {
     private ErrorService errorService;
 
     @Autowired
-    private Environment env;
+    private UtilService utilService;
+
 
     private String id;
 
@@ -134,73 +135,15 @@ public final class AuthService {
 
         return new ClientRequest(
                 locale,
-                createAuth(),
+                utilService.createAuth(),
                 createPayment(sessionRequest),
-                getExpiration(),
+                utilService.getExpiration(),
                 returnUrl,
                 ipAddress,
                 userAgent
         );
     }
 
-    private String getFecha(int incrementoMinutos) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.HOUR, 5);
-        calendar.add(Calendar.MINUTE, incrementoMinutos);
-
-        SimpleDateFormat isoDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-        return isoDate.format(calendar.getTime()) + "+00:00";
-    }
-
-    private String getSeed() {
-        return getFecha(3);
-    }
-
-    private String getExpiration() {
-        return getFecha(20);
-    }
-
-    public byte[] sha1(String toHash) {
-        byte[] bytes = null;
-
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-1");
-            bytes = toHash.getBytes(StandardCharsets.US_ASCII); //I tried UTF-8, ISO-8859-1...
-            digest.update(bytes, 0, bytes.length);
-            bytes = digest.digest();
-        }
-        catch(NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return bytes;
-    }
-
-    private String bin2String(byte[] hex){
-        return HexUtils.toHexString(hex);
-    }
-
-    private byte[] randomBytes() {
-        Random random = ThreadLocalRandom.current();
-        byte[] r = new byte[16];
-        random.nextBytes(r);
-        return r;
-    }
-
-    private Auth createAuth()  {
-        String login = env.getProperty("login");
-        String secrete =  env.getProperty("secrete");
-        String seed = getSeed();
-        String nonce = bin2String(randomBytes());
-
-        byte[] bytes = sha1(nonce + seed + secrete);
-
-        String tranKey = Base64.getEncoder().encodeToString(bytes);
-        String nonceBase64 = Base64.getEncoder().encodeToString(nonce.getBytes());
-
-        return new Auth(login, tranKey, nonceBase64, seed);
-    }
 
     private Payment createPayment(SessionRequest sessionRequest) {
         return new Payment(

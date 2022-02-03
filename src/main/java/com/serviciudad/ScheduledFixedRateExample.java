@@ -12,7 +12,7 @@ public class ScheduledFixedRateExample {
     @Autowired
     FacturaService facturaService;
 
-    @Scheduled(cron = "0 */2 * * * *")
+    @Scheduled(cron = "0 0 0 */1 * *")
     public void scheduleFixedRateTaskAsync()  {
         // facturaService.seleccionarPagosPendientes();
     }

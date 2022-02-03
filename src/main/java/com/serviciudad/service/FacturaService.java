@@ -34,12 +34,14 @@ public final class FacturaService {
     @Autowired
     AuthRepository authRepository;
 
-
     @Autowired
     CronRepository cronRepository;
 
     @Autowired
     private ErrorService errorService;
+
+    @Autowired
+    private UtilService utilService;
 
     public FacturaResponse consultaFactura(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         WebClient webClient = WebClient.create("http://192.168.100.72:8080/recaudos/api");
@@ -116,11 +118,7 @@ public final class FacturaService {
             throw e;
         }
         AuthRequestInformation authRequestInformation = new AuthRequestInformation(
-                new Auth(authModel.getLogin(),
-                        authModel.getTrankey(),
-                        authModel.getNonce(),
-                        authModel.getSeed())
-        );
+                utilService.createAuth());
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -151,7 +149,7 @@ public final class FacturaService {
         PagoResponse pagoResponse;
         RespuestaResponse respuestaResponse;
         AuthModel authModel = consulta(pagoRequest);
-        String motivo;
+
         if (authModel == null) {
 
         }
