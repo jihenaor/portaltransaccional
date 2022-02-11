@@ -12,6 +12,7 @@ import com.serviciudad.modelpago.RespuestaResponse;
 import com.serviciudad.repository.AuthRepository;
 import com.serviciudad.repository.CronRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,25 +44,17 @@ public final class FacturaService {
     @Autowired
     private UtilService utilService;
 
+    @Autowired
+    private Environment env;
+
+    private final String URL_RECAUDO = "http://192.168.100.72:8080/recaudos/api";
+
     public FacturaResponse consultaFactura(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
-        WebClient webClient = WebClient.create("http://192.168.100.72:8080/recaudos/api");
         FacturaResponse facturaResponse;
         AuthModel authModel;
         PagoResponse pagoResponse;
 
-        try {
-            facturaResponse = webClient.post()
-                    .uri("/rec")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(facturaRequest), FacturaRequest.class)
-                    .retrieve()
-                    .bodyToMono(FacturaResponse.class)
-                    .timeout(Duration.ofSeconds(20))  // timeout
-                    .block();
-        } catch (Exception e) {
-            errorService.save(e, "", "Consultando la factura");
-            throw e;
-        }
+        facturaResponse = consultarFactura(facturaRequest);
 
         if (facturaResponse.getCodRespuesta() == 1) {
             throw new DomainExceptionCuentaNoExiste();
@@ -103,6 +96,54 @@ public final class FacturaService {
             throw e;
         }
 
+        return facturaResponse;
+    }
+    private PagoFacturaResponse enviarPago(AuthModel authModel) {
+        PagoFacturaResponse pagoFacturaResponse;
+        WebClient webClient = WebClient.create(URL_RECAUDO);
+
+        String codigoBanco =  env.getProperty("CODIGOBANCOPLACETOPAY");
+
+        PagoFacturaRequest pagoFacturaRequest = new PagoFacturaRequest(
+                authModel.getCuenta(),
+                authModel.getReference(),
+                codigoBanco,
+                authModel.getRequestid() + ""
+        );
+
+        try {
+            pagoFacturaResponse = webClient.post()
+                    .uri("/rec/pagarfactura")
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(pagoFacturaRequest), FacturaRequest.class)
+                    .retrieve()
+                    .bodyToMono(PagoFacturaResponse.class)
+                    .timeout(Duration.ofSeconds(20))  // timeout
+                    .block();
+        } catch (Exception e) {
+            errorService.save(e, "", "Registrando pago de factura");
+            throw e;
+        }
+        return pagoFacturaResponse;
+    }
+
+
+    private FacturaResponse consultarFactura(FacturaRequest facturaRequest) {
+        FacturaResponse facturaResponse;
+        WebClient webClient = WebClient.create(URL_RECAUDO);
+        try {
+            facturaResponse = webClient.post()
+                    .uri("/rec")
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(facturaRequest), FacturaRequest.class)
+                    .retrieve()
+                    .bodyToMono(FacturaResponse.class)
+                    .timeout(Duration.ofSeconds(20))  // timeout
+                    .block();
+        } catch (Exception e) {
+            errorService.save(e, "", "Consultando la factura");
+            throw e;
+        }
         return facturaResponse;
     }
 
@@ -164,6 +205,7 @@ public final class FacturaService {
                 }
 
                 update(authModel);
+                enviarPago(authModel);
             } else {
                 if (porCron) {
                     authModel.setFechaultimointento((new Date()).toString());
