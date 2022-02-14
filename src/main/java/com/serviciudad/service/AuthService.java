@@ -42,6 +42,8 @@ public final class AuthService {
     @Autowired
     private UtilService utilService;
 
+    @Autowired
+    private Environment env;
 
     private String id;
 
@@ -54,7 +56,7 @@ public final class AuthService {
         sessionRequest = getSessionRequest(facturaRequest);
 
         try {
-            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
+            webClient = WebClient.create(env.getProperty("url"));
         } catch (Exception e) {
             errorService.save(e);
             throw e;
