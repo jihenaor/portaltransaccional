@@ -48,4 +48,15 @@ public final class AuthController {
             return ResponseEntity.internalServerError().body(null);
         }
     }
+
+    @RequestMapping(value = "/listarpendientes", method = RequestMethod.GET)
+    public ResponseEntity<List<AuthModel>> listarpendientes() {
+
+        try {
+            return ResponseEntity.ok().body(authService.listarpendientes());
+        } catch (Exception e) {
+            errorService.save(e);
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
 }

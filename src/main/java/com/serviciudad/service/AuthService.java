@@ -3,12 +3,12 @@ package com.serviciudad.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
 import com.serviciudad.exception.DomainExceptionPlaceToPay;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
 import com.serviciudad.repository.AuthRepository;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
@@ -20,13 +20,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public final class AuthService {
@@ -162,5 +157,9 @@ public final class AuthService {
 
     public List<AuthModel> listar() {
         return (List<AuthModel>) authRepository.findAll();
+    }
+
+    public List<AuthModel> listarpendientes() {
+        return (List<AuthModel>) authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
     }
 }
