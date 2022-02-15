@@ -153,7 +153,7 @@ public final class FacturaService {
         String json = "";
 
         try {
-            webClient = WebClient.create("https://checkout-test.placetopay.com/api");
+            webClient = WebClient.create(env.getProperty("url"));
         } catch (Exception e) {
             errorService.save(e);
             throw e;
