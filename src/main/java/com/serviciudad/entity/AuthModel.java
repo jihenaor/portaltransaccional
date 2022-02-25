@@ -34,6 +34,7 @@ public final class AuthModel {
     private int requestid;
     private String autorizacion;
     private String fechaultimointento;
+    private String pagoconfirmado;
 
     public AuthModel(SessionRequest sessionRequest, int requestid, String id) {
 		this.id = id;
@@ -48,5 +49,6 @@ public final class AuthModel {
         this.nonce = sessionRequest.getNonce();
         this.seed = sessionRequest.getSeed();
         this.requestid = requestid;
+        this.pagoconfirmado = "N";
 	}
 }

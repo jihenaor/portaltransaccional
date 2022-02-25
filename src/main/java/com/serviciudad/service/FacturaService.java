@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
+import com.serviciudad.entity.CronModel;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.exception.DomainExceptionNoEncontradoRequestId;
 import com.serviciudad.model.*;
@@ -21,10 +22,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 //Tarjeta de prueba 4005580000000040
@@ -65,6 +66,9 @@ public final class FacturaService {
                                                 facturaResponse.getCuenta(),
                                                 facturaResponse.getIdfactura());
         } catch (Exception e) {
+            errorService.save(e, "", String.format("Error consultando cuenta por referencia: %s, %s",
+                    facturaResponse.getCuenta(),
+                    facturaResponse.getIdfactura()));
             throw e;
         }
 
@@ -120,6 +124,8 @@ public final class FacturaService {
                     .bodyToMono(PagoFacturaResponse.class)
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
+            authModel.setPagoconfirmado("S");
+            update(authModel);
         } catch (Exception e) {
             errorService.save(e, "", "Registrando pago de factura");
             throw e;
@@ -246,6 +252,16 @@ public final class FacturaService {
         return respuestaResponse;
     }
 
+    public void enviarPagoAutorizadoPorCron(PagoRequest pagoRequest) {
+        PagoResponse pagoResponse;
+        RespuestaResponse respuestaResponse;
+        AuthModel authModel = consulta(pagoRequest);
+
+        if (authModel != null) {
+            enviarPago(authModel);
+        }
+    }
+
     private void update(AuthModel authModel) {
         authRepository.save(authModel);
     }
@@ -261,12 +277,25 @@ public final class FacturaService {
     public void seleccionarPagosPendientes() {
         List<AuthModel> authModels = authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
 
-//        cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), authModels.size()));
+        cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), authModels.size()));
 
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             try {
                 pagarFactura(pagoRequest, true);
+            } catch (Exception e) {
+
+            }
+        });
+    }
+
+    public void seleccionarPagosAprobadosSinRegistrar() {
+        List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N");
+
+        authModels.forEach(authModel -> {
+            PagoRequest pagoRequest = new PagoRequest(authModel.getId());
+            try {
+                enviarPagoAutorizadoPorCron(pagoRequest);
             } catch (Exception e) {
 
             }

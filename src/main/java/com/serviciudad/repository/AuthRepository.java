@@ -24,4 +24,7 @@ public interface AuthRepository extends CrudRepository<AuthModel, String> {
     @Query("Select b from AuthModel b where b.requestid = :requestid and b.reference = :reference")
     public AuthModel findByRequestidAndReference(@Param("requestid") int requestid,
                                               @Param("reference") String reference);
+
+    @Query("Select b from AuthModel b where b.estado = :estado and (b.pagoconfirmado = :pagoconfirmado or b.pagoconfirmado is null)")
+    public List<AuthModel> findByEstadoPagoConfirmado(@Param("estado") String estado, @Param("pagoconfirmado") String pagoconfirmado);
 }

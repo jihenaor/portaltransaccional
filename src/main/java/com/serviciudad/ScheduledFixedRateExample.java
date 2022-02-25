@@ -13,8 +13,13 @@ public class ScheduledFixedRateExample {
     FacturaService facturaService;
 
     @Scheduled(cron = "0 0 0 */1 * *")
-    public void scheduleFixedRateTaskAsync()  {
-        // facturaService.seleccionarPagosPendientes();
+    public void seleccionarPagosPendientes()  {
+        facturaService.seleccionarPagosPendientes();
     }
-
+/*
+    @Scheduled(cron = "0 * / 30 * * * *")
+    public void seleccionarPagosAprobadosSinregistrar()  {
+        facturaService.seleccionarPagosAprobadosSinRegistrar();
+    }
+    */
 }
