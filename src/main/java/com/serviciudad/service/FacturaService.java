@@ -211,7 +211,9 @@ public final class FacturaService {
                 }
 
                 update(authModel);
-                enviarPago(authModel);
+                if (authModel.getEstado().equals(Constantes.APPROVED)) {
+                    enviarPago(authModel);
+                }
             } else {
                 if (porCron) {
                     authModel.setFechaultimointento((new Date()).toString());
