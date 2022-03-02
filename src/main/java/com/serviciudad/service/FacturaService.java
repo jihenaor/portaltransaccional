@@ -127,8 +127,10 @@ public final class FacturaService {
                     .bodyToMono(PagoFacturaResponse.class)
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
-            authModel.setPagoconfirmado("S");
-            update(authModel);
+            if (pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
+                authModel.setPagoconfirmado("S");
+                update(authModel);
+            }
         } catch (Exception e) {
             errorService.save(e, "", "Registrando pago de factura");
             throw e;
