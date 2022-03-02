@@ -83,7 +83,7 @@ public final class FacturaController {
         if (clave.equals("pepeloco")) {
             return facturaService.validarFactura(numerofactura);
         } else {
-            new Exception("xx");
+            return new ArrayList<>();
         }
     }
 }
