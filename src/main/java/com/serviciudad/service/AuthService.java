@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
+import com.serviciudad.entity.ValidaciomModel;
 import com.serviciudad.exception.DomainExceptionPlaceToPay;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
@@ -14,7 +15,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -161,5 +164,37 @@ public final class AuthService {
 
     public List<AuthModel> listarpendientes() {
         return (List<AuthModel>) authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
+    }
+
+    public List<ValidaciomModel> listarConfirmadoNoRegistrado() {
+        List<AuthModel> l =  (List<AuthModel>) authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
+        List<ValidaciomModel> validaciomModels = new ArrayList<>();
+        l.forEach(authModel -> {
+            System.out.println(authModel.getCuenta());
+            try {
+                FacturaRequest facturaRequest = new FacturaRequest(authModel.getCuenta());
+                if (authModel.getCuenta().equals("9578509150")) {
+                    int i = 0;
+                }
+
+                String existe = facturaService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
+
+                if (existe.equals("N")) {
+                    authModel.setPagoconfirmado("X");
+                    validaciomModels.add(new ValidaciomModel(
+                                                authModel.getCuenta(),
+                                                authModel.getReference(),
+                                                authModel.getTotal(),
+                                                authModel.getFecha(),
+                                                authModel.getPagoconfirmado()
+                    ));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        return validaciomModels;
     }
 }

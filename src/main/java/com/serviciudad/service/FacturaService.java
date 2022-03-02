@@ -62,9 +62,10 @@ public final class FacturaService {
         }
 
         try {
-            authModel = authRepository.findByCuentaAndReference(
+            authModel = authRepository.findByCuentaAndReferenceEstado(
                                                 facturaResponse.getCuenta(),
-                                                facturaResponse.getIdfactura());
+                                                facturaResponse.getIdfactura(),
+                                                Constantes.APPROVED);
         } catch (Exception e) {
             errorService.save(e, "", String.format("Error consultando cuenta por referencia: %s, %s",
                     facturaResponse.getCuenta(),
@@ -102,6 +103,7 @@ public final class FacturaService {
 
         return facturaResponse;
     }
+
     private PagoFacturaResponse enviarPago(AuthModel authModel) {
         PagoFacturaResponse pagoFacturaResponse;
         WebClient webClient = WebClient.create(URL_RECAUDO);
@@ -133,8 +135,7 @@ public final class FacturaService {
         return pagoFacturaResponse;
     }
 
-
-    private FacturaResponse consultarFactura(FacturaRequest facturaRequest) {
+    public FacturaResponse consultarFactura(FacturaRequest facturaRequest) {
         FacturaResponse facturaResponse;
         WebClient webClient = WebClient.create(URL_RECAUDO);
         try {
@@ -211,7 +212,7 @@ public final class FacturaService {
                 }
 
                 update(authModel);
-                if (authModel.getEstado().equals(Constantes.APPROVED)) {
+                if (authModel.getEstado().trim().equals(Constantes.APPROVED)) {
                     enviarPago(authModel);
                 }
             } else {
@@ -255,8 +256,6 @@ public final class FacturaService {
     }
 
     public void enviarPagoAutorizadoPorCron(PagoRequest pagoRequest) {
-        PagoResponse pagoResponse;
-        RespuestaResponse respuestaResponse;
         AuthModel authModel = consulta(pagoRequest);
 
         if (authModel != null) {
@@ -270,6 +269,13 @@ public final class FacturaService {
 
     public AuthModel consulta(PagoRequest pagoRequest) {
         return authRepository.findByiD(pagoRequest.getId());
+    }
+
+    public List<AuthModel> consultaCuentaFactura(String cuenta, String factura) {
+        return authRepository.findByCuentaAndReference(cuenta, factura);
+    }
+    public List<AuthModel> consultaFactura(String factura) {
+        return authRepository.findByReference(factura);
     }
 
     public AuthModel consultaByRequestidAndReference(NotificacionRequest notificacionRequest) {
@@ -304,6 +310,25 @@ public final class FacturaService {
         });
     }
 
+    public void seleccionarPagosAprobadosConfirmadosValidar() {
+        List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
+
+        authModels.forEach(authModel -> {
+            PagoRequest pagoRequest = new PagoRequest(authModel.getId());
+            String existe = existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
+            if (existe.equals("N")) {
+                try {
+                    System.out.println("procesando: " + authModel.getCuenta());
+                    enviarPagoAutorizadoPorCron(pagoRequest);
+                } catch (Exception e) {
+
+                }
+            } else {
+                System.out.println("Existe: " + authModel.getCuenta());
+            }
+        });
+    }
+
     public void notificarTransaccion(NotificacionRequest notificacionRequest) throws DomainExceptionNoEncontradoRequestId {
         PagoResponse pagoResponse;
         AuthModel authModel = consultaByRequestidAndReference(notificacionRequest);
@@ -332,5 +357,59 @@ public final class FacturaService {
             }
             throw e;
         }
+    }
+
+    public String existePagoEnBaseRecaudo(String cuenta, String factura) {
+        FacturaResponse facturaResponse;
+        WebClient webClient = WebClient.create(URL_RECAUDO);
+        String existeFactura;
+
+        try {
+            existeFactura = webClient.get()
+                    .uri("/rec/consulta/" + cuenta +"/" + factura)
+                    .exchange()
+                    .block()
+                    .bodyToMono(String.class)
+                    .block();
+
+        } catch (Exception e) {
+            errorService.save(e, "", "Consultando existe factura");
+            throw e;
+        }
+        return existeFactura;
+    }
+
+    public List<AuthModel> validarFactura(String factura) {
+        RespuestaResponse respuestaResponse;
+        List<AuthModel> authModel = consultaFactura(factura);
+
+        authModel.forEach(authModel1 -> {
+            PagoResponse pagoResponse;
+
+            try {
+                pagoResponse = consultarEstadoPago(authModel1);
+
+                String status;
+
+                switch (pagoResponse.getStatus().getStatus()) {
+                    case "APPROVED":
+                        status = "APROBADO";
+                        break;
+                    case "REJECTED":
+                        status = "RECHAZADO";
+                        break;
+                    default:
+                        status = pagoResponse.getStatus().getStatus();
+                }
+
+                authModel1.setEstadoevertec(status);
+            } catch (Exception e) {
+
+                throw e;
+            }
+        });
+
+
+        return authModel;
     }
 }
