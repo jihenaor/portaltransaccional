@@ -76,7 +76,7 @@ public final class FacturaController {
             return "clave invalida";
         }
     }
-//270534059
+
     @RequestMapping(value = "/validarevertec/{numerofactura}/{clave}", method = RequestMethod.GET)
     public List<AuthModel> validarevertec(@PathVariable ("numerofactura") String numerofactura,
                                  @PathVariable ("clave") String clave) {
@@ -86,4 +86,13 @@ public final class FacturaController {
             return new ArrayList<>();
         }
     }
+    @RequestMapping(value = "/actualizardiario/{clave}", method = RequestMethod.GET)
+    public int actualizardiario(@PathVariable ("clave") String clave) {
+        if (clave.equals("pepeloco")) {
+            return facturaService.seleccionarPagosPendientes();
+        } else {
+            return -1;
+        }
+    }
+
 }

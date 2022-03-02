@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 //Tarjeta de prueba 4005580000000040
@@ -282,19 +283,21 @@ public final class FacturaService {
         return authRepository.findByRequestidAndReference(notificacionRequest.getRequestID(), notificacionRequest.getReference());
     }
 
-    public void seleccionarPagosPendientes() {
+    public int seleccionarPagosPendientes() {
         List<AuthModel> authModels = authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
-
+        AtomicInteger cont = new AtomicInteger();
         cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), authModels.size()));
 
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             try {
                 pagarFactura(pagoRequest, true);
+                cont.getAndIncrement();
             } catch (Exception e) {
 
             }
         });
+        return cont.get();
     }
 
     public void seleccionarPagosAprobadosSinRegistrar() {
