@@ -67,7 +67,6 @@ public final class AuthService {
         ObjectMapper mapper = new ObjectMapper();
         try {
             json = mapper.writeValueAsString(clientRequest);
-//            encodedString = Base64.getEncoder().encodeToString(json.getBytes());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -111,7 +110,7 @@ public final class AuthService {
         sessionRequest = new SessionRequest(
                 facturaRequest.getCodsuscrip(),
                 facturaResponse.getIdfactura(),
-                facturaResponse.getDescripcion() + " Pago de servicios",
+                "Pago de servicios",
                 facturaResponse.getTotalfactura()
                 );
         return sessionRequest;

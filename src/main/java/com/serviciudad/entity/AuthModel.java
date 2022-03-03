@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 @Entity
@@ -27,7 +30,6 @@ public final class AuthModel {
     private long total;
     private String fecha;
     private String estado;
-    private String seed;
     private int requestid;
     private String autorizacion;
     private String fechaultimointento;
@@ -35,14 +37,17 @@ public final class AuthModel {
     private String estadoevertec;
 
     public AuthModel(SessionRequest sessionRequest, int requestid, String id) {
+        String pattern = "yyyy-MM-dd hh:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String date = simpleDateFormat.format(new Date());
+
 		this.id = id;
 		this.cuenta = sessionRequest.getCuenta();
         this.reference = sessionRequest.getReference();
 		this.descripcion = sessionRequest.getDescripcion();
 		this.total = sessionRequest.getTotal();
-        this.fecha = (new Date()).toString();
+        this.fecha = date;
         this.estado = "PENDING";
-        this.seed = sessionRequest.getSeed();
         this.requestid = requestid;
         this.pagoconfirmado = "N";
 	}
