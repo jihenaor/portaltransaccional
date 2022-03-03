@@ -86,6 +86,7 @@ public final class FacturaController {
             return new ArrayList<>();
         }
     }
+
     @RequestMapping(value = "/actualizardiario/{clave}", method = RequestMethod.GET)
     public int actualizardiario(@PathVariable ("clave") String clave) {
         if (clave.equals("pepeloco")) {

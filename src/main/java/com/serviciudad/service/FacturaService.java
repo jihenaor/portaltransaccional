@@ -200,6 +200,7 @@ public final class FacturaService {
         PagoResponse pagoResponse;
         RespuestaResponse respuestaResponse;
         AuthModel authModel = consulta(pagoRequest);
+        PagoFacturaResponse pagoFacturaResponse = null;
 
         if (authModel == null) {
 
@@ -216,7 +217,7 @@ public final class FacturaService {
 
                 update(authModel);
                 if (authModel.getEstado().trim().equals(Constantes.APPROVED)) {
-                    enviarPago(authModel);
+                    pagoFacturaResponse = enviarPago(authModel);
                 }
             } else {
                 if (porCron) {
@@ -252,7 +253,8 @@ public final class FacturaService {
                 status,
                 pagoResponse.getStatus().getMessage(),
                 authModel.getAutorizacion(),
-                authModel.getCuenta());
+                authModel.getCuenta(),
+                pagoFacturaResponse == null ? "N" : pagoFacturaResponse.getCodigoRespuesta().equals("1") ? "S" : "N");
 
 
         return respuestaResponse;
@@ -293,8 +295,10 @@ public final class FacturaService {
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             try {
-                pagarFactura(pagoRequest, true);
-                cont.getAndIncrement();
+                RespuestaResponse respuestaResponse = pagarFactura(pagoRequest, true);
+                if (respuestaResponse.getPagoregistrado().equals("S")) {
+                    cont.getAndIncrement();
+                }
             } catch (Exception e) {
 
             }

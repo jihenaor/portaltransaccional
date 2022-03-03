@@ -19,4 +19,5 @@ public class RespuestaResponse {
     private final String message;
     private final String authorization;
     private final String cuenta;
+    private final String pagoregistrado;
 }
