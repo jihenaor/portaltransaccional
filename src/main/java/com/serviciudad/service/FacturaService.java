@@ -319,23 +319,22 @@ public final class FacturaService {
         });
     }
 
-    public void seleccionarPagosAprobadosConfirmadosValidar() {
+    public int seleccionarPagosAprobadosConfirmadosValidar() {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
-
+        AtomicInteger cont = new AtomicInteger();
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             String existe = existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
             if (existe.equals("N")) {
                 try {
-                    System.out.println("procesando: " + authModel.getCuenta());
+                    cont.getAndIncrement();
                     enviarPagoAutorizadoPorCron(pagoRequest);
                 } catch (Exception e) {
 
                 }
-            } else {
-                System.out.println("Existe: " + authModel.getCuenta());
             }
         });
+        return cont.get();
     }
 
     public void notificarTransaccion(NotificacionRequest notificacionRequest) throws DomainExceptionNoEncontradoRequestId {

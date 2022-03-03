@@ -66,8 +66,7 @@ public final class FacturaController {
     public String reprocesar(@PathVariable ("clave") String clave) {
         if (clave.equals("pepeloco")) {
             try {
-                facturaService.seleccionarPagosAprobadosConfirmadosValidar();
-                return "OK";
+                return "Procesados:" + facturaService.seleccionarPagosAprobadosConfirmadosValidar();
             } catch (Exception e) {
                 errorService.save(e);
                 return e.getMessage();
