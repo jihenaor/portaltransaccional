@@ -62,9 +62,6 @@ public final class AuthService {
 
         ClientRequest clientRequest = createRequest(sessionRequest);
 
-        sessionRequest.setLogin(clientRequest.getAuth().getLogin());
-        sessionRequest.setNonce(clientRequest.getAuth().getNonce());
-        sessionRequest.setTrankey(clientRequest.getAuth().getTranKey());
         sessionRequest.setSeed(clientRequest.getAuth().getSeed());
 
         ObjectMapper mapper = new ObjectMapper();

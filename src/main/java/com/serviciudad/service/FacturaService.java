@@ -306,22 +306,27 @@ public final class FacturaService {
         return cont.get();
     }
 
-    public void seleccionarPagosAprobadosSinRegistrar() {
+    public String seleccionarPagosAprobadosSinRegistrar() {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N");
+        AtomicInteger cont = new AtomicInteger();
+        AtomicInteger contErrores = new AtomicInteger();
 
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             try {
                 enviarPagoAutorizadoPorCron(pagoRequest);
+                cont.getAndIncrement();
             } catch (Exception e) {
-
+                contErrores.getAndIncrement();
             }
         });
+        return "Aprobados pendientes confirmar: " + cont + " Errores:" + contErrores;
     }
 
-    public int seleccionarPagosAprobadosConfirmadosValidar() {
+    public String seleccionarPagosAprobadosConfirmadosValidar() {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
         AtomicInteger cont = new AtomicInteger();
+
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             String existe = existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
@@ -334,7 +339,7 @@ public final class FacturaService {
                 }
             }
         });
-        return cont.get();
+        return " Aprobado no existe: " + cont.get();
     }
 
     public void notificarTransaccion(NotificacionRequest notificacionRequest) throws DomainExceptionNoEncontradoRequestId {

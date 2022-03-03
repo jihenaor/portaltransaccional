@@ -16,11 +16,11 @@ public class ScheduledFixedRateExample {
     public void seleccionarPagosPendientes()  {
         facturaService.seleccionarPagosPendientes();
     }
-/*
+
+    /*
     @Scheduled(cron = "0 * / 30 * * * *")
     public void seleccionarPagosAprobadosSinregistrar()  {
         facturaService.seleccionarPagosAprobadosSinRegistrar();
     }
     */
-
 }

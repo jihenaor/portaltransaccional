@@ -27,9 +27,6 @@ public final class AuthModel {
     private long total;
     private String fecha;
     private String estado;
-    private String login;
-    private String trankey;
-    private String nonce;
     private String seed;
     private int requestid;
     private String autorizacion;
@@ -45,9 +42,6 @@ public final class AuthModel {
 		this.total = sessionRequest.getTotal();
         this.fecha = (new Date()).toString();
         this.estado = "PENDING";
-        this.login = sessionRequest.getLogin();
-        this.trankey = sessionRequest.getTrankey();
-        this.nonce = sessionRequest.getNonce();
         this.seed = sessionRequest.getSeed();
         this.requestid = requestid;
         this.pagoconfirmado = "N";

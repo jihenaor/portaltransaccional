@@ -76,6 +76,20 @@ public final class FacturaController {
         }
     }
 
+    @RequestMapping(value = "/reprocesaraprobadopendiente/{clave}", method = RequestMethod.GET)
+    public String reprocesaraprobadopendiente(@PathVariable ("clave") String clave) {
+        if (clave.equals("pepeloco")) {
+            try {
+                return "Procesados:" + facturaService.seleccionarPagosAprobadosSinRegistrar();
+            } catch (Exception e) {
+                errorService.save(e);
+                return e.getMessage();
+            }
+        } else {
+            return "clave invalida";
+        }
+    }
+
     @RequestMapping(value = "/validarevertec/{numerofactura}/{clave}", method = RequestMethod.GET)
     public List<AuthModel> validarevertec(@PathVariable ("numerofactura") String numerofactura,
                                  @PathVariable ("clave") String clave) {

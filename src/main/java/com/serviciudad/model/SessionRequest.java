@@ -14,8 +14,5 @@ public class SessionRequest {
     private final String descripcion;
     private final long total;
     private String autorizacion;
-    private String login;
-    private String trankey;
-    private String nonce;
     private String seed;
 }
