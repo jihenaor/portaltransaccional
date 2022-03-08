@@ -360,7 +360,12 @@ public final class FacturaService {
             if (!authModel.getEstado().equals(pagoResponse.getStatus().getStatus())) {
                 authModel.setEstado(pagoResponse.getStatus().getStatus());
                 authModel.setAutorizacion(pagoResponse.getRequest().getPayment().getAuthorization());
-                update(authModel);
+
+                if (authModel.getEstado().trim().equals(Constantes.APPROVED)) {
+                   enviarPago(authModel);
+                } else {
+                    update(authModel);
+                }
             }
         } catch (Exception e) {
             if (e instanceof WebClientResponseException.Unauthorized) {
