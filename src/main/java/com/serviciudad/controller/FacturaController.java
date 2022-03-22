@@ -51,17 +51,6 @@ public final class FacturaController {
         }
     }
 
-    @RequestMapping(value = "/listarconfirmadonoregistrado", method = RequestMethod.GET)
-    public ResponseEntity<List<ValidaciomModel>> listarconfirmadonoregistrado() {
-
-        try {
-            return ResponseEntity.ok().body(authService.listarConfirmadoNoRegistrado());
-        } catch (Exception e) {
-            errorService.save(e);
-            return ResponseEntity.internalServerError().body(null);
-        }
-    }
-
     @RequestMapping(value = "/reprocesar/{clave}", method = RequestMethod.GET)
     public String reprocesar(@PathVariable ("clave") String clave) {
         if (clave.equals("pepeloco")) {

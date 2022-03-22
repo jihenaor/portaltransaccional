@@ -166,12 +166,8 @@ public final class AuthService {
         List<AuthModel> l =  (List<AuthModel>) authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
         List<ValidaciomModel> validaciomModels = new ArrayList<>();
         l.forEach(authModel -> {
-            System.out.println(authModel.getCuenta());
             try {
                 FacturaRequest facturaRequest = new FacturaRequest(authModel.getCuenta());
-                if (authModel.getCuenta().equals("9578509150")) {
-                    int i = 0;
-                }
 
                 String existe = facturaService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
 
