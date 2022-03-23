@@ -384,7 +384,7 @@ public final class FacturaService {
 
         try {
             existeFactura = webClient.get()
-                    .uri("/rec/consulta/" + cuenta +"/" + factura)
+                    .uri("/rec/consulta/" + cuenta +"/" + factura + "/" + env.getProperty("CODIGOBANCOPLACETOPAY"))
                     .exchange()
                     .block()
                     .bodyToMono(String.class)
