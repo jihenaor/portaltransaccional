@@ -15,4 +15,6 @@ public class FacturaResponse {
     private String fechapago;
     private String status;
     private String aplicado;
+    private String fechaultimopago;
+    private String facturavencida;
 }

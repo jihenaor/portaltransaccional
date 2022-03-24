@@ -22,7 +22,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -154,6 +161,20 @@ public final class FacturaService {
             errorService.save(e, "", "Consultando la factura");
             throw e;
         }
+
+        if (facturaResponse.getFechaultimopago() != null && facturaResponse.getFechaultimopago().length() == 10){
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fechaPago = dateFormat.parse(facturaResponse.getFechapago());
+
+                facturaResponse.setFacturavencida(fechaPago.before(new Date()) ? "S" : "N");
+            } catch (ParseException ex) {
+                facturaResponse.setFacturavencida("N");
+            }
+        } else {
+            facturaResponse.setFacturavencida("N");
+        }
+
         return facturaResponse;
     }
 
