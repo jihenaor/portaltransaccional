@@ -139,6 +139,11 @@ public final class FacturaService {
             if (pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
                 authModel.setPagoconfirmado("S");
                 update(authModel);
+            } else {
+                if (pagoFacturaResponse.getComentario().indexOf("ya ha sido registrada") > 0) {
+                    authModel.setPagoconfirmado("S");
+                    update(authModel);
+                }
             }
         } catch (Exception e) {
             errorService.save(e, "", "Registrando pago de factura");
@@ -283,12 +288,14 @@ public final class FacturaService {
         return respuestaResponse;
     }
 
-    public void enviarPagoAutorizadoPorCron(PagoRequest pagoRequest) {
+    public PagoFacturaResponse enviarPagoAutorizadoPorCron(PagoRequest pagoRequest) {
         AuthModel authModel = consulta(pagoRequest);
-
+        PagoFacturaResponse pagoFacturaResponse = null;
         if (authModel != null) {
-            enviarPago(authModel);
+            pagoFacturaResponse = enviarPago(authModel);
         }
+
+        return pagoFacturaResponse;
     }
 
     private void update(AuthModel authModel) {
@@ -337,8 +344,11 @@ public final class FacturaService {
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             try {
-                enviarPagoAutorizadoPorCron(pagoRequest);
-                cont.getAndIncrement();
+                PagoFacturaResponse pagoFacturaResponse = enviarPagoAutorizadoPorCron(pagoRequest);
+                if (pagoFacturaResponse != null && pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
+                    cont.getAndIncrement();
+                }
+
             } catch (Exception e) {
                 contErrores.getAndIncrement();
             }
