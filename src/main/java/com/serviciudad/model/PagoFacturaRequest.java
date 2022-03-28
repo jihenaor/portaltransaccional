@@ -13,4 +13,6 @@ public class PagoFacturaRequest {
     private final String numerofactura;
     private final String banco;
     private final String requestid;
+    private final long total;
+    private final String fecha;
 }

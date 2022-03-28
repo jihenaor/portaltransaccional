@@ -122,7 +122,9 @@ public final class FacturaService {
                 authModel.getCuenta(),
                 authModel.getReference(),
                 codigoBanco,
-                authModel.getRequestid() + ""
+                authModel.getRequestid() + "",
+                authModel.getTotal(),
+                authModel.getFecha()
         );
 
         try {
