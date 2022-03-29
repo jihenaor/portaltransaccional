@@ -10,7 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class NotificacionRequest {
-    private int requestID;
+    private Status status;
+    private int requestId;
     private String reference;
     private String signature;
 }
