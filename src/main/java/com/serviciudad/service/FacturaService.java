@@ -314,7 +314,7 @@ public final class FacturaService {
     }
 
     public AuthModel consultaByRequestidAndReference(NotificacionRequest notificacionRequest) {
-        return authRepository.findByRequestidAndReference(notificacionRequest.getRequestID(), notificacionRequest.getReference());
+        return authRepository.findByRequestidAndReference(notificacionRequest.getRequestId(), notificacionRequest.getReference());
     }
 
     public int seleccionarPagosPendientes() {
