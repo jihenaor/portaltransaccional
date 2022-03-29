@@ -340,11 +340,13 @@ public final class FacturaService {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N");
         AtomicInteger cont = new AtomicInteger();
         AtomicInteger contErrores = new AtomicInteger();
+        AtomicInteger contProcesados = new AtomicInteger();
 
         authModels.forEach(authModel -> {
             PagoRequest pagoRequest = new PagoRequest(authModel.getId());
             try {
                 PagoFacturaResponse pagoFacturaResponse = enviarPagoAutorizadoPorCron(pagoRequest);
+                contProcesados.getAndIncrement();
                 if (pagoFacturaResponse != null && pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
                     cont.getAndIncrement();
                 }
@@ -353,7 +355,7 @@ public final class FacturaService {
                 contErrores.getAndIncrement();
             }
         });
-        return "Aprobados pendientes confirmar: " + cont + " Errores:" + contErrores;
+        return " Procesados "+ contProcesados + " Pagados: " + cont + " Errores:" + contErrores;
     }
 
     public String seleccionarPagosAprobadosConfirmadosValidar() {
@@ -378,10 +380,6 @@ public final class FacturaService {
     public void notificarTransaccion(NotificacionRequest notificacionRequest) throws DomainExceptionNoEncontradoRequestId {
         PagoResponse pagoResponse;
         AuthModel authModel = consultaByRequestidAndReference(notificacionRequest);
-
-        if (notificacionRequest.getReference().equals("XXXXXXXXXX")) {
-            return;
-        }
 
         if (authModel == null) {
             throw new DomainExceptionNoEncontradoRequestId();
