@@ -355,7 +355,10 @@ public final class FacturaService {
                 contErrores.getAndIncrement();
             }
         });
-        return " Procesados "+ contProcesados + " Pagados: " + cont + " Errores:" + contErrores;
+        return "Seleccionados:" + authModels.size() +
+                " Procesados " + contProcesados +
+                " Pagados: " + cont +
+                " Errores:" + contErrores;
     }
 
     public String seleccionarPagosAprobadosConfirmadosValidar() {

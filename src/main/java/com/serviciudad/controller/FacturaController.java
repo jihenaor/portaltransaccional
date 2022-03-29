@@ -69,7 +69,7 @@ public final class FacturaController {
     public String reprocesaraprobadopendiente(@PathVariable ("clave") String clave) {
         if (clave.equals("pepeloco")) {
             try {
-                return "Procesados:" + facturaService.seleccionarPagosAprobadosSinRegistrar();
+                return facturaService.seleccionarPagosAprobadosSinRegistrar();
             } catch (Exception e) {
                 errorService.save(e);
                 return e.getMessage();
