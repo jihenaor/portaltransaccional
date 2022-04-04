@@ -392,6 +392,10 @@ public final class FacturaService {
             return;
         }
 
+        /*
+
+         */
+
         try {
             pagoResponse = consultarEstadoPago(authModel);
 
