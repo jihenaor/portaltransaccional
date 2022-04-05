@@ -169,7 +169,7 @@ public final class FacturaService {
             throw e;
         }
 
-        if (facturaResponse.getFechaultimopago() != null && facturaResponse.getFechaultimopago().length() == 10){
+        if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date fechaPago = dateFormat.parse(facturaResponse.getFechapago());
