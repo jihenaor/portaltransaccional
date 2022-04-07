@@ -31,6 +31,7 @@ public final class AuthModel {
     private String autorizacion;
     private String fechaultimointento;
     private String pagoconfirmado;
+    private String fechapago;
     private String estadoevertec;
 
     public AuthModel(SessionRequest sessionRequest, int requestid, String id) {

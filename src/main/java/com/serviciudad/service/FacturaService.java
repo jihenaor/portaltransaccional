@@ -142,6 +142,13 @@ public final class FacturaService {
             } else {
                 if (pagoFacturaResponse.getComentario().indexOf("ya ha sido registrada") > 0) {
                     authModel.setPagoconfirmado("S");
+
+                    String pattern = "yyyy-MM-dd hh:mm:ss";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    String date = simpleDateFormat.format(new Date());
+
+                    authModel.setFechapago(date);
+
                     update(authModel);
                 }
             }
