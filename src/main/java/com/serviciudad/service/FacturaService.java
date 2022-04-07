@@ -117,6 +117,9 @@ public final class FacturaService {
         WebClient webClient = WebClient.create(URL_RECAUDO);
 
         String codigoBanco =  env.getProperty("CODIGOBANCOPLACETOPAY");
+        String pattern = "yyyy-MM-dd hh:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String date = simpleDateFormat.format(new Date());
 
         PagoFacturaRequest pagoFacturaRequest = new PagoFacturaRequest(
                 authModel.getCuenta(),
@@ -138,17 +141,12 @@ public final class FacturaService {
                     .block();
             if (pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
                 authModel.setPagoconfirmado("S");
+                authModel.setFechapago(date);
                 update(authModel);
             } else {
                 if (pagoFacturaResponse.getComentario().indexOf("ya ha sido registrada") > 0) {
                     authModel.setPagoconfirmado("S");
-
-                    String pattern = "yyyy-MM-dd hh:mm:ss";
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-                    String date = simpleDateFormat.format(new Date());
-
                     authModel.setFechapago(date);
-
                     update(authModel);
                 }
             }
