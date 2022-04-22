@@ -15,9 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -43,8 +41,6 @@ public final class AuthService {
     @Autowired
     private Environment env;
 
-    private String id;
-
     public ClientResponse auth(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste, DomainExceptionPlaceToPay {
         ClientResponse clientResponse;
         SessionRequest sessionRequest;
@@ -60,7 +56,8 @@ public final class AuthService {
             throw e;
         }
 
-        ClientRequest clientRequest = createRequest(sessionRequest);
+        String id = UUID.randomUUID().toString();
+        ClientRequest clientRequest = createRequest(sessionRequest, id);
 
         sessionRequest.setSeed(clientRequest.getAuth().getSeed());
 
@@ -90,7 +87,7 @@ public final class AuthService {
             throw new DomainExceptionPlaceToPay();
         }
 
-        save(sessionRequest, clientResponse.getRequestId());
+        save(sessionRequest, clientResponse.getRequestId(), id);
 
         return clientResponse;
     }
@@ -116,16 +113,13 @@ public final class AuthService {
         return sessionRequest;
     }
 
-    private void save(SessionRequest sessionRequest, int requestId) {
-        authRepository.save(
-                    new AuthModel(sessionRequest, requestId, id));
+    private void save(SessionRequest sessionRequest, int requestId, String id) {
+        authRepository.save(new AuthModel(sessionRequest, requestId, id));
     }
 
-    public ClientRequest createRequest(SessionRequest sessionRequest) {
+    public ClientRequest createRequest(SessionRequest sessionRequest, String id) {
         String locale = "es_CO";
-        id = UUID.randomUUID().toString();
-        String returnUrl = "https://serviciudad.gov.co/apppse/#/finalizar/"
-                + id;
+        String returnUrl = "https://serviciudad.gov.co/apppse/#/finalizar/" + id;
         String ipAddress = "127.0.0.1";
         String userAgent = "PlacetoPay Sandbox";
 
@@ -163,7 +157,7 @@ public final class AuthService {
     }
 
     public List<ValidaciomModel> listarConfirmadoNoRegistrado() {
-        List<AuthModel> l =  (List<AuthModel>) authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
+        List<AuthModel> l =  authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
         List<ValidaciomModel> validaciomModels = new ArrayList<>();
         l.forEach(authModel -> {
             try {

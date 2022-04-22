@@ -25,19 +25,10 @@ import reactor.core.publisher.Mono;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-
-
-//Tarjeta de prueba 4005580000000040
-//
 
 @Service
 public final class FacturaService {
@@ -207,7 +198,6 @@ public final class FacturaService {
         ObjectMapper mapper = new ObjectMapper();
         try {
             json = mapper.writeValueAsString(authRequestInformation);
-//            encodedString = Base64.getEncoder().encodeToString(json.getBytes());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -473,7 +463,6 @@ public final class FacturaService {
                 throw e;
             }
         });
-
 
         return authModel;
     }
