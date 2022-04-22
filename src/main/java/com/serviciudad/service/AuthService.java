@@ -87,7 +87,7 @@ public final class AuthService {
             throw new DomainExceptionPlaceToPay();
         }
 
-        save(sessionRequest, clientResponse.getRequestId(), id);
+        clientResponse = save(sessionRequest, clientResponse, id);
 
         return clientResponse;
     }
@@ -113,8 +113,11 @@ public final class AuthService {
         return sessionRequest;
     }
 
-    private void save(SessionRequest sessionRequest, int requestId, String id) {
-        authRepository.save(new AuthModel(sessionRequest, requestId, id));
+    ClientResponse save(SessionRequest sessionRequest, ClientResponse clientResponse, String id) {
+        authRepository.save(new AuthModel(sessionRequest, clientResponse.getRequestId(), id));
+        clientResponse.setActualizado("S");
+
+        return clientResponse;
     }
 
     public ClientRequest createRequest(SessionRequest sessionRequest, String id) {
@@ -153,7 +156,7 @@ public final class AuthService {
     }
 
     public List<AuthModel> listarpendientes() {
-        return (List<AuthModel>) authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
+        return authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
     }
 
     public List<ValidaciomModel> listarConfirmadoNoRegistrado() {

@@ -415,7 +415,6 @@ public final class FacturaService {
     }
 
     public String existePagoEnBaseRecaudo(String cuenta, String factura) {
-        FacturaResponse facturaResponse;
         WebClient webClient = WebClient.create(URL_RECAUDO);
         String existeFactura;
 
@@ -435,7 +434,6 @@ public final class FacturaService {
     }
 
     public List<AuthModel> validarFactura(String factura) {
-        RespuestaResponse respuestaResponse;
         List<AuthModel> authModel = consultaFactura(factura);
 
         authModel.forEach(authModel1 -> {

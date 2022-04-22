@@ -11,5 +11,5 @@ public class ClientResponse {
     private Status status;
     private int requestId;
     private String processUrl;
-    
+    private String actualizado;
 }
