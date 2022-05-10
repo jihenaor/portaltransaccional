@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -165,15 +166,18 @@ public final class FacturaService {
             throw e;
         }
 
-        if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fechaPago = dateFormat.parse(facturaResponse.getFechapago());
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.getTime();
 
-                facturaResponse.setFacturavencida(fechaPago.before(new Date()) ? "S" : "N");
-            } catch (ParseException ex) {
-                facturaResponse.setFacturavencida("N");
-            }
+        if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago());
+            Integer fechaActual = Integer.parseInt(dateFormat.format(new Date()));
+
+            facturaResponse.setFacturavencida(fechaActual > fechaPago ? "S" : "N");
         } else {
             facturaResponse.setFacturavencida("N");
         }
