@@ -166,12 +166,6 @@ public final class FacturaService {
             throw e;
         }
 
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.getTime();
-
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
             Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago());
