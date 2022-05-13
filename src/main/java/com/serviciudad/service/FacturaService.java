@@ -168,7 +168,7 @@ public final class FacturaService {
 
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-            Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago());
+            Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
             Integer fechaActual = Integer.parseInt(dateFormat.format(new Date()));
 
             facturaResponse.setFacturavencida(fechaActual > fechaPago ? "S" : "N");
