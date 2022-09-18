@@ -1,28 +1,23 @@
 package com.serviciudad.controller;
 
-import com.serviciudad.entity.AuthModel;
 import com.serviciudad.entity.ValidaciomModel;
-import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
-import com.serviciudad.model.FacturaRequest;
-import com.serviciudad.model.FacturaResponse;
-import com.serviciudad.service.AuthService;
+import com.serviciudad.service.AuthRecaudoService;
 import com.serviciudad.service.ErrorService;
-import com.serviciudad.service.FacturaService;
+import com.serviciudad.service.FacturaEvertecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public final class ListarconfirmadonoregistradoController {
     @Autowired
-    private FacturaService facturaService;
+    private FacturaEvertecService facturaService;
 
     @Autowired
-    private AuthService authService;
+    private AuthRecaudoService authService;
 
     @Autowired
     private ErrorService errorService;

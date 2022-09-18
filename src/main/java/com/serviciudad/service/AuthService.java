@@ -1,189 +1,48 @@
 package com.serviciudad.service;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serviciudad.constantes.Constantes;
-import com.serviciudad.entity.AuthModel;
-import com.serviciudad.entity.ValidaciomModel;
-import com.serviciudad.exception.DomainExceptionPlaceToPay;
-import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
-import com.serviciudad.model.*;
-import com.serviciudad.repository.AuthRepository;
+import com.serviciudad.compartido.exceptions.ApiUnauthorized;
+import com.serviciudad.entity.LoginUser;
+import com.serviciudad.entity.PasswordUser;
+import com.serviciudad.model.JwtResponse;
+import com.serviciudad.model.UserResponse;
+import com.serviciudad.security.JwtIO;
+import com.serviciudad.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
-
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.util.*;
+import java.util.Optional;
 
 @Service
-public final class AuthService {
+public class AuthService {
     @Autowired
-    AuthRepository authRepository;
-
-    @Autowired
-    private FacturaService facturaService;
+    private JwtIO jwtIO;
 
     @Autowired
-    private ErrorService errorService;
+    private UserService userService;
 
     @Autowired
-    private UtilService utilService;
+    private DateUtils dateUtil;
 
-    @Autowired
-    private Environment env;
+    @Value("${jms.jwt.token.expires-in}")
+    private int EXPIRES_IN;
 
-    public ClientResponse auth(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste, DomainExceptionPlaceToPay {
-        ClientResponse clientResponse;
-        SessionRequest sessionRequest;
-        WebClient webClient;
-        String json = "";
+    public JwtResponse login(String usuario, String contrasena) throws ApiUnauthorized {
 
-        sessionRequest = getSessionRequest(facturaRequest);
+        Optional<UserResponse> userResponse = userService.findByLogin(new LoginUser(usuario), new PasswordUser(contrasena));
 
-        try {
-            webClient = WebClient.create(env.getProperty("url"));
-        } catch (Exception e) {
-            errorService.save(e);
-            throw e;
+        if (userResponse.isPresent()) {
+            JwtResponse jwtResponse = JwtResponse.builder()
+                    .tokenType("bearer")
+                    .accessToken(jwtIO.generateToken(userResponse.get()))
+                    .issuedAt(dateUtil.getDateMillis() + "")
+                    .clientId(usuario)
+                    .expiresIn(EXPIRES_IN)
+                    .build();
+
+            return jwtResponse;
+        } else {
+            throw new ApiUnauthorized("Usuario no valido");
         }
-
-        String id = UUID.randomUUID().toString();
-        ClientRequest clientRequest = createRequest(sessionRequest, id);
-
-        sessionRequest.setSeed(clientRequest.getAuth().getSeed());
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            json = mapper.writeValueAsString(clientRequest);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            clientResponse = webClient.post()
-                    .uri("/session")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(clientRequest), ClientRequest.class)
-                    .retrieve()
-
-                    .bodyToMono(ClientResponse.class)
-                    .timeout(Duration.ofSeconds(20))  // timeout
-                    .block();
-        } catch (Exception e) {
-            if (e instanceof WebClientResponseException.Unauthorized) {
-                errorService.save(json, "auth");
-            } else {
-                errorService.save(e);
-            }
-            throw new DomainExceptionPlaceToPay();
-        }
-
-        clientResponse = save(sessionRequest, clientResponse, id);
-
-        return clientResponse;
-    }
-
-    private SessionRequest getSessionRequest(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
-        FacturaResponse facturaResponse;
-        SessionRequest sessionRequest;
-        try {
-            facturaResponse = facturaService.consultaFactura(facturaRequest);
-        } catch (DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
-            throw domainExceptionCuentaNoExiste;
-        } catch (Exception e) {
-            errorService.save(e);
-            throw e;
-        }
-
-        sessionRequest = new SessionRequest(
-                facturaRequest.getCodsuscrip(),
-                facturaResponse.getIdfactura(),
-                "Pago de servicios",
-                facturaResponse.getTotalfactura()
-                );
-        return sessionRequest;
-    }
-
-    ClientResponse save(SessionRequest sessionRequest, ClientResponse clientResponse, String id) {
-        authRepository.save(new AuthModel(sessionRequest, clientResponse.getRequestId(), id));
-        clientResponse.setActualizado("S");
-
-        return clientResponse;
-    }
-
-    public ClientRequest createRequest(SessionRequest sessionRequest, String id) {
-        String locale = "es_CO";
-        String returnUrl = "https://serviciudad.gov.co/apppse/#/finalizar/" + id;
-        String ipAddress = "127.0.0.1";
-        String userAgent = "PlacetoPay Sandbox";
-
-        return new ClientRequest(
-                locale,
-                utilService.createAuth(),
-                createPayment(sessionRequest),
-                utilService.getExpiration(),
-                returnUrl,
-                ipAddress,
-                userAgent
-        );
-    }
-
-
-    private Payment createPayment(SessionRequest sessionRequest) {
-        return new Payment(
-                sessionRequest.getReference(),
-                sessionRequest.getDescripcion(),
-                createAmount(sessionRequest.getTotal()),
-                false
-                );
-    }
-
-    private Amount createAmount(long total) {
-        return new Amount("COP", total);
-    }
-
-    public List<AuthModel> listar() {
-        return (List<AuthModel>) authRepository.findAll();
-    }
-
-    public List<AuthModel> listarpendientes() {
-        return authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
-    }
-
-    public List<ValidaciomModel> listarConfirmadoNoRegistrado() {
-        List<AuthModel> l =  authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
-        List<ValidaciomModel> validaciomModels = new ArrayList<>();
-        l.forEach(authModel -> {
-            try {
-                FacturaRequest facturaRequest = new FacturaRequest(authModel.getCuenta());
-
-                String existe = facturaService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
-
-                if (existe.equals("N")) {
-                    authModel.setPagoconfirmado("X");
-                    validaciomModels.add(new ValidaciomModel(
-                                                authModel.getCuenta(),
-                                                authModel.getReference(),
-                                                authModel.getTotal(),
-                                                authModel.getFecha(),
-                                                authModel.getPagoconfirmado()
-                    ));
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        return validaciomModels;
     }
 }

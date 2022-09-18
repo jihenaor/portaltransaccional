@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class FacturaRequest {
-    private String codsuscrip;
+        private String codsuscrip;
 
     public FacturaRequest(String codsuscrip) {
         this.codsuscrip = codsuscrip;

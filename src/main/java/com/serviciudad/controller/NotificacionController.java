@@ -2,10 +2,8 @@ package com.serviciudad.controller;
 
 import com.serviciudad.exception.DomainExceptionNoEncontradoRequestId;
 import com.serviciudad.model.NotificacionRequest;
-import com.serviciudad.model.PagoRequest;
-import com.serviciudad.modelpago.RespuestaResponse;
 import com.serviciudad.service.ErrorService;
-import com.serviciudad.service.FacturaService;
+import com.serviciudad.service.FacturaEvertecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public final class NotificacionController {
     @Autowired
-    private FacturaService facturaService;
+    private FacturaEvertecService facturaService;
 
     @Autowired
     private ErrorService errorService;

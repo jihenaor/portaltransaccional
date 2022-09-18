@@ -33,6 +33,7 @@ public final class AuthModel {
     private String pagoconfirmado;
     private String fechapago;
     private String estadoevertec;
+    private String error;
 
     public AuthModel(SessionRequest sessionRequest, int requestid, String id) {
         String pattern = "yyyy-MM-dd hh:mm:ss";
@@ -48,5 +49,6 @@ public final class AuthModel {
         this.estado = "PENDING";
         this.requestid = requestid;
         this.pagoconfirmado = "N";
+        this.error = "";
 	}
 }
