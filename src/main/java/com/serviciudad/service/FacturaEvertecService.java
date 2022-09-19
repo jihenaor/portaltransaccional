@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -137,17 +138,21 @@ public final class FacturaEvertecService {
                 authModel.setPagoconfirmado("S");
                 authModel.setFechapago(date);
                 update(authModel);
-            } else {
-                if (pagoFacturaResponse.getCodigoRespuesta().equals("4")) {
-                    authModel.setError(pagoFacturaResponse.getComentario());
-                    update(authModel);
-                } else {
-                    if (pagoFacturaResponse.getComentario().indexOf("ya ha sido registrada") > 0) {
-                        authModel.setPagoconfirmado("S");
-                        authModel.setFechapago(date);
-                        update(authModel);
-                    }
+            } else if (pagoFacturaResponse.getCodigoRespuesta().equals("4")) {
+                authModel.setError(pagoFacturaResponse.getComentario());
+                update(authModel);
+            } else if (pagoFacturaResponse.getCodigoRespuesta().equals("7")) {
+                authModel.setError(pagoFacturaResponse.getComentario());
+                authModel.setPagoconfirmado("S");
+                authModel.setFechapago(authModel.getFecha());
+                if (validaSinRegistrar) {
+                    authModel.setError("Actualizado por cronJob");
                 }
+                update(authModel);
+            } else if (pagoFacturaResponse.getComentario().indexOf("ya ha sido registrada") > 0) {
+                authModel.setPagoconfirmado("S");
+                authModel.setFechapago(date);
+                update(authModel);
             }
         } catch (Exception e) {
             errorService.save(e, "", "Registrando pago de factura");
@@ -339,29 +344,33 @@ public final class FacturaEvertecService {
         return cont.get();
     }
 
-    public String seleccionarPagosAprobadosSinRegistrar() {
+    public void seleccionarPagosAprobadosSinRegistrar() {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N");
-        AtomicInteger cont = new AtomicInteger();
-        AtomicInteger contErrores = new AtomicInteger();
-        AtomicInteger contProcesados = new AtomicInteger();
+
 
         authModels.forEach(authModel -> {
             PagoEvertecRequest pagoRequest = new PagoEvertecRequest(authModel.getId());
             try {
-                PagoFacturaResponse pagoFacturaResponse = enviarPagoAutorizadoPorCron(pagoRequest);
-                contProcesados.getAndIncrement();
-                if (pagoFacturaResponse != null && pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
-                    cont.getAndIncrement();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                Date fechaRecaudo = dateFormat.parse(authModel.getFecha());
+
+
+                long diff = (new Date()).getTime() - fechaRecaudo.getTime();
+                TimeUnit time = TimeUnit.HOURS;
+                long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
+
+                if (diffrence > 3) {
+                    PagoFacturaResponse pagoFacturaResponse = enviarPagoAutorizadoPorCron(pagoRequest);
+
+                    if (pagoFacturaResponse != null && pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
+
+                    }
                 }
 
             } catch (Exception e) {
-                contErrores.getAndIncrement();
+
             }
         });
-        return "Seleccionados:" + authModels.size() +
-                " Procesados " + contProcesados +
-                " Pagados: " + cont +
-                " Errores:" + contErrores;
     }
 
     public String seleccionarPagosAprobadosConfirmadosValidar() {
@@ -440,6 +449,7 @@ public final class FacturaEvertecService {
         }
         return existeFactura;
     }
+
 
     public List<AuthModel> validarFactura(String factura) {
         List<AuthModel> authModel = consultaFactura(factura);

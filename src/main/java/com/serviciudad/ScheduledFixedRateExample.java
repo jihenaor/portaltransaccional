@@ -18,7 +18,7 @@ public class ScheduledFixedRateExample {
     }
 
 
-    @Scheduled(cron = "0 * / 30 * * * *")
+    @Scheduled(cron = "0 */30 * * * *")
     public void seleccionarPagosAprobadosSinregistrar()  {
         facturaService.seleccionarPagosAprobadosSinRegistrar();
     }

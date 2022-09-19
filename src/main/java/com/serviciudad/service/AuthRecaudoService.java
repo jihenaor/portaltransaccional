@@ -41,6 +41,7 @@ public final class AuthRecaudoService {
     @Autowired
     private Environment env;
 
+
     public ClientResponse auth(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste, DomainExceptionPlaceToPay {
         ClientResponse clientResponse;
         SessionRequest sessionRequest;
@@ -187,19 +188,4 @@ public final class AuthRecaudoService {
         return validaciomModels;
     }
 
-    public List<AuthModel> listarAprobadosNoConfirmados() {
-        List<AuthModel> l =  authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
-        List<AuthModel> authModels = new ArrayList<>();
-        l.forEach(authModel -> {
-            try {
-                actualiza a confirmado
-
-                consultarrecaudosicep/cuenta/tipofactura/nrofactura
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        return authModels;
-    }
 }
