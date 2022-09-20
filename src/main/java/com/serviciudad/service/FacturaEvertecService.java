@@ -315,6 +315,13 @@ public final class FacturaEvertecService {
         return pagoFacturaResponse;
     }
 
+    public PagoFacturaResponse enviarPagoAutorizadoPorCron(AuthModel authModel) {
+        PagoFacturaResponse pagoFacturaResponse = enviarPagoEvertec(authModel, true);
+
+        return pagoFacturaResponse;
+    }
+
+
     private void update(AuthModel authModel) {
         authRepository.save(authModel);
     }
@@ -354,9 +361,7 @@ public final class FacturaEvertecService {
     public void seleccionarPagosAprobadosSinRegistrar() {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N");
 
-
         authModels.forEach(authModel -> {
-            PagoEvertecRequest pagoRequest = new PagoEvertecRequest(authModel.getId());
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 Date fechaRecaudo = dateFormat.parse(authModel.getFecha());
@@ -367,7 +372,7 @@ public final class FacturaEvertecService {
                 long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
 
                 if (diffrence > 3) {
-                    PagoFacturaResponse pagoFacturaResponse = enviarPagoAutorizadoPorCron(pagoRequest);
+                    PagoFacturaResponse pagoFacturaResponse = enviarPagoAutorizadoPorCron(authModel);
 
                     if (pagoFacturaResponse != null && pagoFacturaResponse.getCodigoRespuesta().equals("1")) {
 
@@ -375,7 +380,7 @@ public final class FacturaEvertecService {
                 }
 
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         });
     }

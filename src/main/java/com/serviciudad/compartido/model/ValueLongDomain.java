@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 public abstract class ValueLongDomain implements Serializable {
 
-    private static final String REGEXP = "^-?\\\\d{1,19}$";
-    private static final Pattern pattern = Pattern.compile(REGEXP, Pattern.CASE_INSENSITIVE);
+    private static final String REGEXP = "^\\d*$";
+
     @Getter(AccessLevel.NONE)
     private static final long serialVersionUID = 1L;
 
@@ -59,9 +59,8 @@ public abstract class ValueLongDomain implements Serializable {
      */
     private String validarCaracteresRestringidos(String value) {
         String resultado;
-        Matcher matcher = pattern.matcher(value);
-        if (matcher.find()) {
-            throw new ExcepcionInformacionInvalida("Informacion invalida.");
+        if (!Pattern.matches(REGEXP, value)) {
+            throw new ExcepcionInformacionInvalida("Solo informacion numerica.");
         }
         resultado = LimpiarXSS.limpiar(value);
         return resultado;
