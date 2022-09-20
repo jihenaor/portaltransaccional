@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
 import com.serviciudad.entity.CronModel;
+import com.serviciudad.entity.IdRecaudoModel;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.exception.DomainExceptionNoEncontradoRequestId;
 import com.serviciudad.model.*;
@@ -50,6 +51,9 @@ public final class FacturaEvertecService {
 
     @Value("${url_recaudo}")
     private String URL_RECAUDO;
+
+    public FacturaEvertecService() {
+    }
 
     public FacturaResponse consultaFactura(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         FacturaResponse facturaResponse;
@@ -153,6 +157,9 @@ public final class FacturaEvertecService {
                 authModel.setPagoconfirmado("S");
                 authModel.setFechapago(date);
                 update(authModel);
+            } else {
+                authModel.setError(pagoFacturaResponse.getComentario());
+                update(authModel);
             }
         } catch (Exception e) {
             errorService.save(e, "", "Registrando pago de factura");
@@ -235,7 +242,7 @@ public final class FacturaEvertecService {
     public RespuestaResponse pagarFactura(PagoEvertecRequest pagoRequest, boolean porCron) {
         PagoResponse pagoResponse;
         RespuestaResponse respuestaResponse;
-        AuthModel authModel = consulta(pagoRequest);
+        AuthModel authModel = consulta(new IdRecaudoModel(pagoRequest.getId()));
         PagoFacturaResponse pagoFacturaResponse = null;
 
         if (authModel == null) {
@@ -264,8 +271,10 @@ public final class FacturaEvertecService {
             if (e instanceof WebClientResponseException.Unauthorized) {
                 authModel.setEstado("UNAUTHORIZED");
                 authModel.setFechaultimointento((new Date()).toString());
-                update(authModel);
+            } else {
+                authModel.setError(e.getMessage());
             }
+            update(authModel);
             throw e;
         }
 
@@ -297,7 +306,7 @@ public final class FacturaEvertecService {
     }
 
     public PagoFacturaResponse enviarPagoAutorizadoPorCron(PagoEvertecRequest pagoRequest) {
-        AuthModel authModel = consulta(pagoRequest);
+        AuthModel authModel = consulta(new IdRecaudoModel(pagoRequest.getId()));
         PagoFacturaResponse pagoFacturaResponse = null;
         if (authModel != null) {
             pagoFacturaResponse = enviarPagoEvertec(authModel, true);
@@ -310,13 +319,11 @@ public final class FacturaEvertecService {
         authRepository.save(authModel);
     }
 
-    public AuthModel consulta(PagoEvertecRequest pagoRequest) {
-        return authRepository.findByiD(pagoRequest.getId());
+    public AuthModel consulta(IdRecaudoModel idRecaudoModel) {
+        return authRepository.findByiD(idRecaudoModel.getValue());
     }
 
-    public List<AuthModel> consultaCuentaFactura(String cuenta, String factura) {
-        return authRepository.findByCuentaAndReference(cuenta, factura);
-    }
+
     public List<AuthModel> consultaFactura(String factura) {
         return authRepository.findByReference(factura);
     }

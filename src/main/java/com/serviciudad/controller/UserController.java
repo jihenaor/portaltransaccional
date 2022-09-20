@@ -30,7 +30,7 @@ public final class UserController {
 
     @Operation(summary = "Adiciona usuario")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario creado",
+            @ApiResponse(responseCode = "200", description = "Usuario creado",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ResponseVersion.class)) }),
             @ApiResponse(responseCode = "400", description = "Invalid id supplied",
