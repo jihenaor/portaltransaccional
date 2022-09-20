@@ -114,7 +114,7 @@ public final class FacturaEvertecService {
         WebClient webClient = WebClient.create(URL_RECAUDO);
 
         String codigoBanco =  env.getProperty("CODIGOBANCOPLACETOPAY");
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String date = simpleDateFormat.format(new Date());
 
@@ -363,7 +363,7 @@ public final class FacturaEvertecService {
 
         authModels.forEach(authModel -> {
             try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date fechaRecaudo = dateFormat.parse(authModel.getFecha());
 
 

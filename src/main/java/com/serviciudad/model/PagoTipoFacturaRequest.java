@@ -19,6 +19,6 @@ public class PagoTipoFacturaRequest {
     private String banco;
     @Schema(description = "Valor de la factura")
     private long total;
-    @Schema(description = "Fecha del recaudo en formato yyyy-MM-dd hh:mm:ss")
+    @Schema(description = "Fecha del recaudo en formato yyyy-MM-dd HH:mm:ss")
     private String fecha;
 }

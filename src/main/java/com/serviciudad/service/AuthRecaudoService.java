@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
+import com.serviciudad.entity.CuentaModel;
 import com.serviciudad.entity.ValidaciomModel;
 import com.serviciudad.exception.DomainExceptionPlaceToPay;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
@@ -21,8 +22,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public final class AuthRecaudoService {
@@ -47,6 +52,10 @@ public final class AuthRecaudoService {
         SessionRequest sessionRequest;
         WebClient webClient;
         String json = "";
+
+        if (existeSessionEnCurso(new CuentaModel(facturaRequest.getCodsuscrip()))) {
+            return new ClientResponse();
+        }
 
         sessionRequest = getSessionRequest(facturaRequest);
 
@@ -73,7 +82,7 @@ public final class AuthRecaudoService {
             clientResponse = webClient.post()
                     .uri("/session")
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(clientRequest), ClientRequest.class)
+                     .body(Mono.just(clientRequest), ClientRequest.class)
                     .retrieve()
 
                     .bodyToMono(ClientResponse.class)
@@ -188,4 +197,34 @@ public final class AuthRecaudoService {
         return validaciomModels;
     }
 
+    private boolean existeSessionEnCurso(CuentaModel cuentaModel) {
+        List<AuthModel> authModels;
+        AtomicReference<Boolean> existe = new AtomicReference<>(false);
+
+        try {
+            authModels = authRepository.findByCuentaEstado(cuentaModel.getValue(), Constantes.ESTADO_PENDIENTE);
+
+            authModels.forEach(authModel -> {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date fechaRecaudo = null;
+
+                try {
+                    fechaRecaudo = dateFormat.parse(authModel.getFecha());
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+
+                long diff = (new Date()).getTime() - fechaRecaudo.getTime();
+                TimeUnit time = TimeUnit.MINUTES;
+                long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
+
+                if (diffrence < 10) {
+                    existe.set(true);
+                }
+            });
+        } catch (Exception e) {
+            throw e;
+        }
+        return existe.get();
+    }
 }

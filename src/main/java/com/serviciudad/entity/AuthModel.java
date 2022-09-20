@@ -36,7 +36,7 @@ public final class AuthModel {
     private String error;
 
     public AuthModel(SessionRequest sessionRequest, int requestid, String id) {
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         String date = simpleDateFormat.format(new Date());
 
