@@ -22,4 +22,5 @@ public class FacturaResponse {
     private String aplicado;
     private String fechaultimopago;
     private String facturavencida;
+    private String ciclo;
 }
