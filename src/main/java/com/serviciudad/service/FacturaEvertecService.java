@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -239,15 +240,20 @@ public final class FacturaEvertecService {
         return pagoResponse;
     }
 
-    public RespuestaResponse pagarFactura(PagoEvertecRequest pagoRequest, boolean porCron) {
+    public RespuestaResponse pagarFactura(PagoEvertecRequest pagoRequest,
+                                          boolean porCron,
+                                          Optional<AuthModel> authModelPar) {
         PagoResponse pagoResponse;
         RespuestaResponse respuestaResponse;
-        AuthModel authModel = consulta(new IdRecaudoModel(pagoRequest.getId()));
-        PagoFacturaResponse pagoFacturaResponse = null;
 
-        if (authModel == null) {
+        AuthModel authModel;
 
+        if (authModelPar.isPresent()) {
+            authModel = authModelPar.get();
+        } else {
+            authModel = consulta(new IdRecaudoModel(pagoRequest.getId()));
         }
+        PagoFacturaResponse pagoFacturaResponse = null;
 
         try {
             pagoResponse = consultarEstadoPago(authModel);
@@ -265,6 +271,8 @@ public final class FacturaEvertecService {
             } else {
                 if (porCron) {
                     authModel.setFechaultimointento((new Date()).toString());
+                    authModel.setError("Estado evertec" + pagoResponse.getStatus().getStatus());
+                    update(authModel);
                 }
             }
         } catch (Exception e) {
@@ -347,7 +355,7 @@ public final class FacturaEvertecService {
         authModels.forEach(authModel -> {
             PagoEvertecRequest pagoRequest = new PagoEvertecRequest(authModel.getId());
             try {
-                RespuestaResponse respuestaResponse = pagarFactura(pagoRequest, true);
+                RespuestaResponse respuestaResponse = pagarFactura(pagoRequest, true, Optional.of(authModel));
                 if (respuestaResponse.getPagoregistrado().equals("S")) {
                     cont.getAndIncrement();
                 }
@@ -355,6 +363,7 @@ public final class FacturaEvertecService {
 
             }
         });
+        cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), cont.get()));
         return cont.get();
     }
 
@@ -365,7 +374,6 @@ public final class FacturaEvertecService {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date fechaRecaudo = dateFormat.parse(authModel.getFecha());
-
 
                 long diff = (new Date()).getTime() - fechaRecaudo.getTime();
                 TimeUnit time = TimeUnit.HOURS;

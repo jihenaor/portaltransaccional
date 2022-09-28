@@ -1,5 +1,7 @@
 package com.serviciudad.security;
 
+import com.google.gson.Gson;
+import com.serviciudad.entity.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,9 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 	@Value("#{'${jms.jwt.excluded.path}'.split(',')}")
 	private List<String> excluded;
 
+	@Value("#{'${jms.jwt.excluded.rutasadministrador}'.split(',')}")
+	private List<String> rutas_administrador;
+
 	@Autowired
 	private JwtIO jwtIO;
 
@@ -31,7 +36,7 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 		boolean validate = false;
 		String uri = request.getRequestURI();
 
-		if (uri.equals(AUTH_PATH) || excluded(uri) || uri.contains(SWAGGER_PATH)) {
+		if (uri.equals(AUTH_PATH) || excluded(excluded, uri) || uri.contains(SWAGGER_PATH)) {
 			validate = true;
 		}
 
@@ -40,6 +45,12 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 			String token = request.getHeader("Authorization") .replace("Bearer ", "");
 
 			validate = !jwtIO.validateToken(token);
+
+			UserModel userModel1 = new Gson().fromJson(jwtIO.getPayload(token), UserModel.class);
+
+			if (userModel1.getPerfil().equals("ADMINISTRADOR") && !excluded(rutas_administrador, uri)) {
+				validate = false;
+			}
 		}
 
 		if(!validate) {
@@ -49,11 +60,11 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 		return validate;
 	}
 
-	private boolean excluded(String path) {
+	private boolean excluded(List<String> excludeds, String path) {
 
 		boolean result = false;
 
-		for(String exc : excluded) {
+		for(String exc : excludeds) {
 
 			if(!exc.equals("#") && exc.equals(path)) {
 				result = true;

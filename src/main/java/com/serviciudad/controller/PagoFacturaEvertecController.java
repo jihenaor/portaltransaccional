@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api")
 public final class PagoFacturaEvertecController {
@@ -20,7 +22,7 @@ public final class PagoFacturaEvertecController {
     @RequestMapping(value = "/pagarfactura", method = RequestMethod.POST)
     public ResponseEntity<RespuestaResponse> pagarfactura(@RequestBody PagoEvertecRequest pagoRequest) {
         try {
-            return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest, false));
+            return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest, false, Optional.empty()));
         } catch (Exception e) {
             errorService.save(e);
             return ResponseEntity.internalServerError().body(null);

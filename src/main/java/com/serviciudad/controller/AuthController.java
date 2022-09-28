@@ -8,6 +8,7 @@ import com.serviciudad.model.ClientResponse;
 import com.serviciudad.model.FacturaRequest;
 import com.serviciudad.service.AuthRecaudoService;
 import com.serviciudad.service.ErrorService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,7 @@ public final class AuthController {
     }
 
     @RequestMapping(value = "/listarpendientes", method = RequestMethod.GET)
+    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<List<AuthModel>> listarpendientes() {
 
         try {
