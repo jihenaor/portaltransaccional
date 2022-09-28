@@ -44,12 +44,12 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 
 			String token = request.getHeader("Authorization") .replace("Bearer ", "");
 
-			validate = !jwtIO.validateToken(token);
-
 			UserModel userModel1 = new Gson().fromJson(jwtIO.getPayload(token), UserModel.class);
 
 			if (userModel1.getPerfil().equals("ADMINISTRADOR") && !excluded(rutas_administrador, uri)) {
 				validate = false;
+			} else {
+				validate = !jwtIO.validateToken(token);
 			}
 		}
 
