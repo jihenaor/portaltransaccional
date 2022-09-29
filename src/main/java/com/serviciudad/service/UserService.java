@@ -69,8 +69,7 @@ public final class UserService {
 
     public Optional<UserResponse> findByLogin(LoginUser login, PasswordUser password)  {
         Optional<UserModel> userModel = userRepository.findById(login.getValue());
-        System.out.println(userModel.isPresent());
-        System.out.println(userModel.get().getPassword().equals(cifrarPasword(password.getValue())));
+
         return userModel.isPresent() && userModel.get().getPassword().equals(cifrarPasword(password.getValue()))
                 ? Optional.of(UserResponse.fromAgragate(userModel.get()))
                 : Optional.empty();

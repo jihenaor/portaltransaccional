@@ -36,7 +36,7 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 		boolean validate = false;
 		String uri = request.getRequestURI();
 
-		if (uri.equals(AUTH_PATH) || excluded(excluded, uri) || uri.contains(SWAGGER_PATH)) {
+		if (uri.contains(AUTH_PATH) || excluded(excluded, uri) || uri.contains(SWAGGER_PATH)) {
 			validate = true;
 		}
 
