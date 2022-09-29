@@ -22,7 +22,9 @@ public final class PagoFacturaEvertecController {
     @RequestMapping(value = "/pagarfactura", method = RequestMethod.POST)
     public ResponseEntity<RespuestaResponse> pagarfactura(@RequestBody PagoEvertecRequest pagoRequest) {
         try {
-            return ResponseEntity.ok().body(facturaService.pagarFactura(pagoRequest, false, Optional.empty()));
+            return ResponseEntity.ok().body(facturaService.pagarFactura(Optional.of(pagoRequest),
+                                                    false,
+                                                Optional.empty()));
         } catch (Exception e) {
             errorService.save(e);
             return ResponseEntity.internalServerError().body(null);

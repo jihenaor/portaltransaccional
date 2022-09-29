@@ -3,6 +3,7 @@ package com.serviciudad.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serviciudad.constantes.Constantes;
+import com.serviciudad.controller.ActualizarDiarioController;
 import com.serviciudad.entity.AuthModel;
 import com.serviciudad.entity.CronModel;
 import com.serviciudad.entity.IdRecaudoModel;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 @Service
 public final class FacturaEvertecService {
@@ -52,6 +54,8 @@ public final class FacturaEvertecService {
 
     @Value("${url_recaudo}")
     private String URL_RECAUDO;
+
+    static final Logger LOGGER = Logger.getLogger(String.valueOf(ActualizarDiarioController.class));
 
     public FacturaEvertecService() {
     }
@@ -240,7 +244,7 @@ public final class FacturaEvertecService {
         return pagoResponse;
     }
 
-    public RespuestaResponse pagarFactura(PagoEvertecRequest pagoRequest,
+    public RespuestaResponse pagarFactura(Optional<PagoEvertecRequest> pagoRequest,
                                           boolean porCron,
                                           Optional<AuthModel> authModelPar) {
         PagoResponse pagoResponse;
@@ -251,8 +255,16 @@ public final class FacturaEvertecService {
         if (authModelPar.isPresent()) {
             authModel = authModelPar.get();
         } else {
-            authModel = consulta(new IdRecaudoModel(pagoRequest.getId()));
+            authModel = consulta(new IdRecaudoModel(pagoRequest.get().getId()));
         }
+
+        if (authModel == null) {
+            LOGGER.info(String.format("Error: %s %s",
+                    pagoRequest.isPresent() ? "Pagorequest: " + pagoRequest.get().getId() : "",
+                    authModelPar.isPresent() ? "AuthModel: " + authModelPar.get().getId() : "")
+            );
+        }
+
         PagoFacturaResponse pagoFacturaResponse = null;
 
         try {
@@ -352,9 +364,8 @@ public final class FacturaEvertecService {
         cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), authModels.size()));
 
         authModels.forEach(authModel -> {
-            PagoEvertecRequest pagoRequest = new PagoEvertecRequest(authModel.getId());
             try {
-                RespuestaResponse respuestaResponse = pagarFactura(pagoRequest, true, Optional.of(authModel));
+                RespuestaResponse respuestaResponse = pagarFactura(Optional.empty(), true, Optional.of(authModel));
                 if (respuestaResponse.getPagoregistrado().equals("S")) {
                     cont.getAndIncrement();
                 }
