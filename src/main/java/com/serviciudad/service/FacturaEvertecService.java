@@ -244,7 +244,7 @@ public final class FacturaEvertecService {
         return pagoResponse;
     }
 
-    public RespuestaResponse pagarFactura(Optional<PagoEvertecRequest> pagoRequest,
+    public RespuestaResponse pagarFactura(Optional<IdRecaudoModel> idRecaudoModel,
                                           boolean porCron,
                                           Optional<AuthModel> authModelPar) {
         PagoResponse pagoResponse;
@@ -255,13 +255,13 @@ public final class FacturaEvertecService {
         if (authModelPar.isPresent()) {
             authModel = authModelPar.get();
         } else {
-            authModel = consulta(new IdRecaudoModel(pagoRequest.get().getId()));
+            authModel = consulta(idRecaudoModel.get());
         }
 
         if (authModel == null) {
             LOGGER.info(String.format("Error: %s %s",
-                    pagoRequest.isPresent() ? "Pagorequest: " + pagoRequest.get().getId() : "",
-                    authModelPar.isPresent() ? "AuthModel: " + authModelPar.get().getId() : "")
+                    idRecaudoModel.isPresent() ? "Pagorequest: -" + idRecaudoModel.get().getValue() : "-",
+                    authModelPar.isPresent() ? "AuthModel: -" + authModelPar.get().getId() : "-")
             );
         }
 

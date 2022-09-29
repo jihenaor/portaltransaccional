@@ -1,5 +1,6 @@
 package com.serviciudad.controller;
 
+import com.serviciudad.entity.IdRecaudoModel;
 import com.serviciudad.model.PagoEvertecRequest;
 import com.serviciudad.modelpago.RespuestaResponse;
 import com.serviciudad.service.ErrorService;
@@ -22,7 +23,7 @@ public final class PagoFacturaEvertecController {
     @RequestMapping(value = "/pagarfactura", method = RequestMethod.POST)
     public ResponseEntity<RespuestaResponse> pagarfactura(@RequestBody PagoEvertecRequest pagoRequest) {
         try {
-            return ResponseEntity.ok().body(facturaService.pagarFactura(Optional.of(pagoRequest),
+            return ResponseEntity.ok().body(facturaService.pagarFactura(Optional.of(new IdRecaudoModel(pagoRequest.getId())),
                                                     false,
                                                 Optional.empty()));
         } catch (Exception e) {
