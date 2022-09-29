@@ -26,6 +26,7 @@ public final class AuthController {
     private ErrorService errorService;
 
     @RequestMapping(value = "/listarsessiones", method = RequestMethod.GET)
+    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<List<AuthModel>> listar() {
 
         try {

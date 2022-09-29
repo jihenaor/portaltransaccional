@@ -271,7 +271,7 @@ public final class FacturaEvertecService {
             } else {
                 if (porCron) {
                     authModel.setFechaultimointento((new Date()).toString());
-                    authModel.setError("Estado evertec" + pagoResponse.getStatus().getStatus());
+                    authModel.setError("Estado evertec " + pagoResponse.getStatus().getStatus());
                     update(authModel);
                 }
             }
@@ -308,7 +308,6 @@ public final class FacturaEvertecService {
                 authModel.getAutorizacion(),
                 authModel.getCuenta(),
                 pagoFacturaResponse == null ? "N" : pagoFacturaResponse.getCodigoRespuesta().equals("1") ? "S" : "N");
-
 
         return respuestaResponse;
     }
@@ -360,7 +359,7 @@ public final class FacturaEvertecService {
                     cont.getAndIncrement();
                 }
             } catch (Exception e) {
-
+                errorService.save(e);
             }
         });
         cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), cont.get()));
