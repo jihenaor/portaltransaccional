@@ -66,6 +66,28 @@ public class AutenticationController {
                 )
         );
     }
+
+    @RequestMapping(value = "/oauth/cliente_credential/accesstoken2", method = RequestMethod.POST)
+    public ResponseEntity<String> login2(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Permite validar si un usuario tiene autorización para usar las APIS y obtiene con respuesta un JWT",
+                    content = @Content(
+                            examples = @ExampleObject( name = "usuario",
+                                    value = "{\"usuario\": \"recaudador\", \"contrasena\": \"Ka38%C#u6b$k\"}",
+                                    summary = "Ejemplo JSON autenticacion")
+                    )
+            )
+            @RequestBody Request request
+
+    ) throws ApiUnauthorized {
+
+        return ResponseEntity.ok(
+                authenticationService.login2(
+                        request.getUsuario(),
+                        request.getContrasena()
+                )
+        );
+    }
 }
 
 

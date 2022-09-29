@@ -3,8 +3,10 @@ package com.serviciudad.service;
 import com.serviciudad.compartido.exceptions.ApiUnauthorized;
 import com.serviciudad.entity.LoginUser;
 import com.serviciudad.entity.PasswordUser;
+import com.serviciudad.entity.UserModel;
 import com.serviciudad.model.JwtResponse;
 import com.serviciudad.model.UserResponse;
+import com.serviciudad.repository.UserRepository;
 import com.serviciudad.security.JwtIO;
 import com.serviciudad.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class AuthService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     private DateUtils dateUtil;
@@ -45,4 +50,12 @@ public class AuthService {
             throw new ApiUnauthorized("Usuario no valido");
         }
     }
+
+    public String login2(String usuario, String contrasena) {
+        Optional<UserModel> userModel = userRepository.findById(usuario);
+    //    Optional<UserResponse> userResponse = userService.findByLogin(new LoginUser(usuario), new PasswordUser(contrasena));
+
+        return userModel.isPresent()? "S" : "N";
+    }
+
 }
