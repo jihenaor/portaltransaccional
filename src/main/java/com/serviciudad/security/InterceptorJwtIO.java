@@ -1,6 +1,7 @@
 package com.serviciudad.security;
 
 import com.google.gson.Gson;
+import com.serviciudad.controller.ActualizarDiarioController;
 import com.serviciudad.entity.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Component
 public class InterceptorJwtIO implements HandlerInterceptor {
@@ -28,6 +30,8 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 
 	@Autowired
 	private JwtIO jwtIO;
+
+	static final Logger LOGGER = Logger.getLogger(String.valueOf(InterceptorJwtIO.class));
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -54,6 +58,7 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 		}
 
 		if(!validate) {
+			LOGGER.info("No autorizado " + uri);
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 
