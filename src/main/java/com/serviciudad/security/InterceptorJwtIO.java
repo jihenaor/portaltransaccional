@@ -66,7 +66,7 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 
 		for(String exc : excludeds) {
 
-			if(!exc.equals("#") && exc.equals(path)) {
+			if(!exc.equals("#") && path.contains(exc)) {
 				result = true;
 			}
 		}
