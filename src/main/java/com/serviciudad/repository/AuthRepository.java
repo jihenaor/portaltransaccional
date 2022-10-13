@@ -47,4 +47,10 @@ public interface AuthRepository extends CrudRepository<AuthModel, String> {
             @Param("estado") String estado,
             @Param("pagoconfirmado") String pagoconfirmado,
             @Param("fecha") String fecha);
+
+    @Query("Select b from AuthModel b where b.fecha like ?1%")
+    public List<AuthModel> findByFecha(@Param("fecha") String fecha);
 }
+/*
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjU3ODk1MzEsImlhdCI6MTY2NTcwMzEzMSwiaXNzIjoic2VydmljaXVkYWQuZ292LmNvIiwic3ViIjoie1wibG9naW5cIjpcImpvcmdlLmhlbmFvXCIsXCJiYW5jb1wiOlwiMFwiLFwicGVyZmlsXCI6XCJBRE1JTklTVFJBRE9SXCJ9In0.SttsnEBXKiRZtshFy32_BQd13TIoK_JpPF45YMznIIw
+ */

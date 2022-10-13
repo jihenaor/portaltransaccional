@@ -42,6 +42,7 @@ public class ValueStringDomain implements Serializable {
      * @throws ExcepcionInformacionInvalida cadena con caracteres no permitidos
      */
     private String validar(String value) {
+        /*
         String resultado;
         if(value!= null && !value.equals("")){
             resultado = validarCaracteresRestringidos(value);
@@ -49,6 +50,9 @@ public class ValueStringDomain implements Serializable {
             resultado = value;
         }
         return resultado;
+
+         */
+        return value;
     }
 
     /**

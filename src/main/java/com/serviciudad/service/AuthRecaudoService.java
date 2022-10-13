@@ -3,6 +3,7 @@ package com.serviciudad.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serviciudad.compartido.model.ValueStringDomain;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
 import com.serviciudad.entity.CuentaModel;
@@ -144,10 +145,6 @@ public final class AuthRecaudoService {
 
     private Amount createAmount(long total) {
         return new Amount("COP", total);
-    }
-
-    public List<AuthModel> listar() {
-        return (List<AuthModel>) authRepository.findAll();
     }
 
     public List<AuthModel> listarpendientes() {
