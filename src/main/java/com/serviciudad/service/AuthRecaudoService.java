@@ -104,23 +104,8 @@ public final class AuthRecaudoService {
 
     private SessionRequest getSessionRequest(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         FacturaResponse facturaResponse;
-        SessionRequest sessionRequest;
-        try {
-            facturaResponse = facturaService.consultaFactura(facturaRequest);
-        } catch (DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
-            throw domainExceptionCuentaNoExiste;
-        } catch (Exception e) {
-            errorService.save(e);
-            throw e;
-        }
 
-        sessionRequest = new SessionRequest(
-                facturaRequest.getCodsuscrip(),
-                facturaResponse.getIdfactura(),
-                "Pago de servicios",
-                facturaResponse.getTotalfactura()
-                );
-        return sessionRequest;
+        return null;
     }
 
     ClientResponse save(SessionRequest sessionRequest, ClientResponse clientResponse, String id) {
@@ -174,8 +159,6 @@ public final class AuthRecaudoService {
         List<ValidaciomModel> validaciomModels = new ArrayList<>();
         l.forEach(authModel -> {
             try {
-                FacturaRequest facturaRequest = new FacturaRequest(authModel.getCuenta());
-
                 String existe = facturaService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
 
                 if (existe.equals("N")) {

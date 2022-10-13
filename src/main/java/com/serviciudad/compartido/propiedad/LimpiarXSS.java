@@ -30,13 +30,19 @@ public final class LimpiarXSS {
         value = StringEscapeUtils.unescapeXml(value);
         value = StringEscapeUtils.unescapeJava(value);
         value = StringEscapeUtils.unescapeCsv(value);
-        value = Encode.forJavaScript(value);
+        value = limpiarJavaScript(value);
 
         //Sanea el los valores entrada de html y javascript para protecci�n
         //contra XSS
         value = Jsoup.clean(value, Whitelist.none());
         value = StringEscapeUtils.unescapeHtml4(value);
         value = StringEscapeUtils.unescapeHtml3(value);
+        return value;
+    }
+
+    public static String limpiarJavaScript(String value) {
+        value = Encode.forJavaScript(value);
+
         return value;
     }
 }

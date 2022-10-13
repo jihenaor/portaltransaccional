@@ -58,13 +58,11 @@ public abstract class ValueObjectDomain implements Serializable {
      * @throws ExcepcionInformacionInvalida cadena con caracteres no permitidos
      */
     private String validarCaracteresRestringidos(String value) {
-        String resultado;
         Matcher matcher = pattern.matcher(value);
         if (matcher.find()) {
             throw new ExcepcionInformacionInvalida("Informacion invalida.");
         }
-        resultado = LimpiarXSS.limpiar(value);
-        return resultado;
+        return LimpiarXSS.limpiar(value);
     }
 
     public boolean comparar(ValueObjectDomain comp) {

@@ -63,14 +63,7 @@ public abstract class ValueIdDomain implements Serializable {
         if (matcher.find()) {
             throw new ExcepcionInformacionInvalida("Informacion invalida.");
         }
-//      resultado = LimpiarXSS.limpiar(value);
-        return value;
-    }
-
-    public boolean comparar(ValueIdDomain comp) {
-        return (value == null && (comp == null || comp.getValue() == null)) ||
-                  (value == null && comp.getValue().trim().length() == 0) ||
-                  (value != null && value.trim().length() == 0 && (comp == null || comp.getValue() == null)) ||
-                  (comp != null && value != null && value.equals(comp.getValue()));
+        resultado = LimpiarXSS.limpiarJavaScript(value);
+        return resultado;
     }
 }

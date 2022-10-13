@@ -7,11 +7,13 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAutoConfiguration
 @EnableConfigurationProperties
 @SpringBootApplication
+@EnableRetry
 public class PortaltransaccionalApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {

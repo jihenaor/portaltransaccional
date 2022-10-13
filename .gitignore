@@ -32,3 +32,4 @@ build/
 
 ### VS Code ###
 .vscode/
+log.log             # write logs to the current directory/spring.log.2022-09-29.0.gz
