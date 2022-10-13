@@ -154,32 +154,6 @@ public final class AuthRecaudoService {
         return authRepository.findByEstado(Constantes.ESTADO_PENDIENTE);
     }
 
-    public List<ValidaciomModel> listarConfirmadoNoRegistrado() {
-        List<AuthModel> l =  authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
-        List<ValidaciomModel> validaciomModels = new ArrayList<>();
-        l.forEach(authModel -> {
-            try {
-                String existe = facturaService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
-
-                if (existe.equals("N")) {
-                    authModel.setPagoconfirmado("X");
-                    validaciomModels.add(new ValidaciomModel(
-                                                authModel.getCuenta(),
-                                                authModel.getReference(),
-                                                authModel.getTotal(),
-                                                authModel.getFecha(),
-                                                authModel.getPagoconfirmado()
-                    ));
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        return validaciomModels;
-    }
-
     private boolean existeSessionEnCurso(CuentaModel cuentaModel) {
         List<AuthModel> authModels;
         AtomicReference<Boolean> existe = new AtomicReference<>(false);
