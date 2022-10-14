@@ -288,3 +288,31 @@ java.lang.NullPointerException: null
 2022-10-14 10:36:58.396  INFO 26376 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2022-10-14 10:36:58.398  INFO 26376 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
 2022-10-14 10:40:40.088  WARN 26376 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m12s358ms45µs300ns).
+2022-10-14 10:40:48.756  INFO 12984 --- [restartedMain] c.s.PortaltransaccionalApplication       : Starting PortaltransaccionalApplication using Java 11.0.16.1 on JORGEP-HENAO with PID 12984 (D:\Proyectos personales\serviciudad\portaltransaccional\target\classes started by jorge.henao in D:\Proyectos personales\serviciudad\portaltransaccional)
+2022-10-14 10:40:48.758  INFO 12984 --- [restartedMain] c.s.PortaltransaccionalApplication       : No active profile set, falling back to default profiles: default
+2022-10-14 10:40:48.833  INFO 12984 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-10-14 10:40:48.834  INFO 12984 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-10-14 10:40:50.157  INFO 12984 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-10-14 10:40:50.353  INFO 12984 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 185 ms. Found 4 JPA repository interfaces.
+2022-10-14 10:40:50.801  INFO 12984 --- [restartedMain] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.retry.annotation.RetryConfiguration' of type [org.springframework.retry.annotation.RetryConfiguration$$EnhancerBySpringCGLIB$$28bc03ad] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-10-14 10:40:52.347  INFO 12984 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-10-14 10:40:52.359  INFO 12984 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-10-14 10:40:52.360  INFO 12984 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.56]
+2022-10-14 10:40:52.477  INFO 12984 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-10-14 10:40:52.477  INFO 12984 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3643 ms
+2022-10-14 10:40:53.168  INFO 12984 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-10-14 10:40:53.242  INFO 12984 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.3.Final
+2022-10-14 10:40:53.433  INFO 12984 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-10-14 10:40:53.552  INFO 12984 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-10-14 10:40:53.638  INFO 12984 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-10-14 10:40:53.653  INFO 12984 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: com.serviciudad.SQLDialect
+2022-10-14 10:40:54.151  INFO 12984 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-10-14 10:40:54.159  INFO 12984 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-10-14 10:40:55.284  WARN 12984 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-10-14 10:40:57.793  INFO 12984 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-10-14 10:40:57.809  INFO 12984 --- [restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint(s) beneath base path '/actuator'
+2022-10-14 10:40:57.881  INFO 12984 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-10-14 10:40:57.902  INFO 12984 --- [restartedMain] c.s.PortaltransaccionalApplication       : Started PortaltransaccionalApplication in 9.593 seconds (JVM running for 10.314)
+2022-10-14 10:41:14.018  INFO 12984 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-10-14 10:41:14.019  INFO 12984 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-10-14 10:41:14.021  INFO 12984 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
