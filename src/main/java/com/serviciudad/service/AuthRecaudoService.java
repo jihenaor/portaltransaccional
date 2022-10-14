@@ -105,8 +105,23 @@ public final class AuthRecaudoService {
 
     private SessionRequest getSessionRequest(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         FacturaResponse facturaResponse;
+        SessionRequest sessionRequest;
+        try {
+            facturaResponse = facturaService.consultaFactura(facturaRequest);
+        } catch (DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
+            throw domainExceptionCuentaNoExiste;
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
 
-        return null;
+        sessionRequest = new SessionRequest(
+                facturaRequest.getCodsuscrip(),
+                facturaResponse.getIdfactura(),
+                "Pago de servicios",
+                facturaResponse.getTotalfactura()
+                );
+        return sessionRequest;
     }
 
     ClientResponse save(SessionRequest sessionRequest, ClientResponse clientResponse, String id) {
