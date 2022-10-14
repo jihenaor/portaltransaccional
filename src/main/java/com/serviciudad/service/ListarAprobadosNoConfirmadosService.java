@@ -35,13 +35,19 @@ public final class ListarAprobadosNoConfirmadosService {
     @Autowired
     private ConsultaExisteRecaudoSicepService consultaExisteRecaudoSicepService;
 
+    @Autowired
+    private Environment env;
+
     public List<AuthModel> listarAprobadosNoConfirmados() {
         List<AuthModel> l =  authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N", "%");
         List<AuthModel> authModels = new ArrayList<>();
         l.forEach(authModel -> {
             try {
                 String existeSicep = consultaExisteRecaudoSicepService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
-                String existeTemporal = facturaEvertecService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
+                String existeTemporal = facturaEvertecService.existePagoEnBaseRecaudo(
+                                                                    authModel.getCuenta(),
+                                                                    authModel.getReference(),
+                                                                    env.getProperty("CODIGOBANCOPLACETOPAY"));
 
                 if (existeSicep.equals("N") && existeTemporal.equals("N")) {
                     authModels.add(authModel);

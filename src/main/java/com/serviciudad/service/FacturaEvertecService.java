@@ -385,7 +385,7 @@ public class FacturaEvertecService {
         });
     }
 
-    public String seleccionarPagosAprobadosConfirmadosValidar(ValueStringDomain fecha) {
+    public String seleccionarPagosAprobadosConfirmadosValidar(ValueStringDomain fecha, String codigoBanco) {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(
                                             Constantes.APPROVED,
                                 "S",
@@ -394,7 +394,7 @@ public class FacturaEvertecService {
 
         authModels.forEach(authModel -> {
             PagoEvertecRequest pagoRequest = new PagoEvertecRequest(authModel.getId());
-            String existe = existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
+            String existe = existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference(), codigoBanco);
             if (existe.equals("N")) {
                 try {
                     cont.getAndIncrement();
@@ -446,13 +446,13 @@ public class FacturaEvertecService {
         }
     }
 
-    public String existePagoEnBaseRecaudo(String cuenta, String factura) {
+    public String existePagoEnBaseRecaudo(String cuenta, String factura, String codigoBanco) {
         WebClient webClient = WebClient.create(URL_RECAUDO);
         String existeFactura;
 
         try {
             existeFactura = webClient.get()
-                    .uri("/rec/consulta/" + cuenta +"/" + factura + "/" + env.getProperty("CODIGOBANCOPLACETOPAY"))
+                    .uri("/rec/consulta/" + cuenta +"/" + factura + "/" + codigoBanco)
                     .exchange()
                     .block()
                     .bodyToMono(String.class)

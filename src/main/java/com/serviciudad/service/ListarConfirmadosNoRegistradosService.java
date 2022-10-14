@@ -40,12 +40,17 @@ public final class ListarConfirmadosNoRegistradosService {
     @Autowired
     private FacturaEvertecService facturaService;
 
+    @Autowired
+    private Environment env;
+
     public List<ValidaciomModel> listarConfirmadoNoRegistrado(ValueStringDomain fecha) {
         List<AuthModel> l =  authRepository.findByEstadoPagoConfirmadoFecha(Constantes.APPROVED, "S", fecha.getValue().concat("%"));
         List<ValidaciomModel> validaciomModels = new ArrayList<>();
         l.forEach(authModel -> {
             try {
-                String existe = facturaService.existePagoEnBaseRecaudo(authModel.getCuenta(), authModel.getReference());
+                String existe = facturaService.existePagoEnBaseRecaudo(authModel.getCuenta(),
+                                                                       authModel.getReference(),
+                                                                       env.getProperty("CODIGOBANCOPLACETOPAY"));
 
                 if (existe.equals("N")) {
                     authModel.setPagoconfirmado("X");
