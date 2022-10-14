@@ -459,7 +459,7 @@ public class FacturaEvertecService {
                     .block();
 
         } catch (Exception e) {
-            errorService.save(e, "", "Consultando existe factura");
+            errorService.save(e, "", "Consultando existe factura " + factura);
             throw e;
         }
         return existeFactura;
