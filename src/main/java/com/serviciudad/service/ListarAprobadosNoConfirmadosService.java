@@ -36,7 +36,7 @@ public final class ListarAprobadosNoConfirmadosService {
     private ConsultaExisteRecaudoSicepService consultaExisteRecaudoSicepService;
 
     public List<AuthModel> listarAprobadosNoConfirmados() {
-        List<AuthModel> l =  authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N");
+        List<AuthModel> l =  authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N", "%");
         List<AuthModel> authModels = new ArrayList<>();
         l.forEach(authModel -> {
             try {

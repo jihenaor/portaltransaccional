@@ -33,8 +33,10 @@ public interface AuthRepository extends CrudRepository<AuthModel, String> {
     public AuthModel findByRequestidAndReference(@Param("requestid") int requestid,
                                               @Param("reference") String reference);
 
-    @Query("Select b from AuthModel b where b.estado = :estado and (b.pagoconfirmado = :pagoconfirmado or b.pagoconfirmado is null)")
-    public List<AuthModel> findByEstadoPagoConfirmado(@Param("estado") String estado, @Param("pagoconfirmado") String pagoconfirmado);
+    @Query("Select b from AuthModel b where b.estado = :estado and (b.pagoconfirmado = :pagoconfirmado or b.pagoconfirmado is null) and b.fecha like :fecha")
+    public List<AuthModel> findByEstadoPagoConfirmado(@Param("estado") String estado,
+                                                      @Param("pagoconfirmado") String pagoconfirmado,
+                                                      @Param("fecha") String fecha);
 
     @Query("Select b from AuthModel b where b.cuenta = :cuenta and b.estado = :estado")
     public List<AuthModel> findByCuentaEstado(@Param("cuenta") String cuenta, @Param("estado") String estado);

@@ -2,6 +2,7 @@ package com.serviciudad.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.serviciudad.compartido.model.ValueStringDomain;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.controller.ActualizarDiarioController;
 import com.serviciudad.entity.AuthModel;
@@ -357,8 +358,9 @@ public class FacturaEvertecService {
         return cont.get();
     }
 
-    public void seleccionarPagosAprobadosSinRegistrar() {
-        List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "N");
+    public void seleccionarPagosAprobadosSinRegistrar(ValueStringDomain fecha) {
+        List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(
+                    Constantes.APPROVED, "N", fecha.getValue().concat("%"));
 
         authModels.forEach(authModel -> {
             try {
@@ -383,8 +385,11 @@ public class FacturaEvertecService {
         });
     }
 
-    public String seleccionarPagosAprobadosConfirmadosValidar() {
-        List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(Constantes.APPROVED, "S");
+    public String seleccionarPagosAprobadosConfirmadosValidar(ValueStringDomain fecha) {
+        List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(
+                                            Constantes.APPROVED,
+                                "S",
+                                            fecha.getValue().concat("%"));
         AtomicInteger cont = new AtomicInteger();
 
         authModels.forEach(authModel -> {
@@ -399,7 +404,7 @@ public class FacturaEvertecService {
                 }
             }
         });
-        return " Aprobado no existe: " + cont.get();
+        return "Aprobado evertec no existe recaudo: " + cont.get();
     }
 
     public void notificarTransaccion(NotificacionRequest notificacionRequest) throws DomainExceptionNoEncontradoRequestId {

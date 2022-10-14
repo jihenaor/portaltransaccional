@@ -1,5 +1,6 @@
 package com.serviciudad;
 
+import com.serviciudad.compartido.model.ValueStringDomain;
 import com.serviciudad.service.FacturaEvertecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,7 @@ public class ScheduledFixedRateExample {
 
     @Scheduled(cron = "0 */30 * * * *")
     public void seleccionarPagosAprobadosSinregistrar()  {
-        facturaService.seleccionarPagosAprobadosSinRegistrar();
+        facturaService.seleccionarPagosAprobadosSinRegistrar(new ValueStringDomain(""));
     }
 
 }

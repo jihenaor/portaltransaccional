@@ -1,5 +1,6 @@
 package com.serviciudad.controller.factura;
 
+import com.serviciudad.compartido.model.ValueStringDomain;
 import com.serviciudad.entity.AuthModel;
 import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.FacturaEvertecService;
@@ -20,12 +21,12 @@ public final class FacturaController {
     @Autowired
     private ErrorService errorService;
 
-    @RequestMapping(value = "/reprocesar/{clave}", method = RequestMethod.GET)
+    @RequestMapping(value = "/reprocesar/{clave}/{fecha}", method = RequestMethod.GET)
     @SecurityRequirement(name = "Bearer Authentication")
-    public String reprocesar(@PathVariable ("clave") String clave) {
+    public String reprocesar(@PathVariable ("clave") String clave, @PathVariable("fecha") String fecha) {
         if (clave.equals("pepeloco")) {
             try {
-                return "Procesados:" + facturaService.seleccionarPagosAprobadosConfirmadosValidar();
+                return "Procesados:" + facturaService.seleccionarPagosAprobadosConfirmadosValidar(new ValueStringDomain(fecha, 10));
             } catch (Exception e) {
                 errorService.save(e);
                 return e.getMessage();
