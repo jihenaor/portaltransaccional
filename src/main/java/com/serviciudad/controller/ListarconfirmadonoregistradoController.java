@@ -1,11 +1,8 @@
 package com.serviciudad.controller;
 
-import com.serviciudad.compartido.model.ValueObjectDomain;
 import com.serviciudad.compartido.model.ValueStringDomain;
 import com.serviciudad.entity.ValidaciomModel;
-import com.serviciudad.service.AuthRecaudoService;
 import com.serviciudad.service.ErrorService;
-import com.serviciudad.service.FacturaEvertecService;
 import com.serviciudad.service.ListarConfirmadosNoRegistradosService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;

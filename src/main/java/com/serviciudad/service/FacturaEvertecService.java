@@ -19,11 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -31,7 +28,6 @@ import reactor.core.publisher.Mono;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 @Service
-public class FacturaEvertecService {
+public final class FacturaEvertecService {
     @Autowired
     AuthRepository authRepository;
 
@@ -65,36 +61,61 @@ public class FacturaEvertecService {
     public FacturaEvertecService() {
     }
 
+    public FacturaResponse consultaFactura(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
+        FacturaResponse facturaResponse;
+        AuthModel authModel;
+        PagoResponse pagoResponse;
 
-    @Retryable(value = {DomainExceptionCuentaNoExiste.class}, maxAttempts = 4, backoff = @Backoff(1000))
-    public String retryExample(String s) {
-        LOGGER.info("Retry retryTemplateExample " + LocalDateTime.now().getSecond());
-        if (s == "error") {
+        facturaResponse = consultarFactura(facturaRequest);
+
+        if (facturaResponse.getCodRespuesta() == 1) {
             throw new DomainExceptionCuentaNoExiste();
-        } else {
-            return "Hi " + s;
         }
+
+        try {
+            authModel = authRepository.findByCuentaAndReferenceEstado(
+                                                facturaResponse.getCuenta(),
+                                                facturaResponse.getIdfactura(),
+                                                Constantes.APPROVED);
+        } catch (Exception e) {
+            errorService.save(e, "", String.format("Error consultando cuenta por referencia: %s, %s",
+                    facturaResponse.getCuenta(),
+                    facturaResponse.getIdfactura()));
+            throw e;
+        }
+
+        try {
+            if (authModel != null) {
+                if (Constantes.ESTADO_PENDIENTE.equals(authModel.getEstado())) {
+                    pagoResponse = consultarEstadoPago(authModel);
+                    if (!pagoResponse.getStatus().getStatus().equals(authModel.getEstado())) {
+                        authModel.setEstado(pagoResponse.getStatus().getStatus());
+                        authRepository.save(authModel);
+                    }
+                    facturaResponse.setStatus(pagoResponse.getStatus().getStatus());
+                } else {
+                    facturaResponse.setStatus(authModel.getEstado());
+                }
+            } else {
+                facturaResponse.setStatus("NOINICIADO");
+            }
+        } catch (WebClientResponseException e) {
+            if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+                authModel.setEstado(Constantes.UNAUTHORIZED);
+                authRepository.save(authModel);
+                facturaResponse.setStatus("");
+            } else {
+                throw e;
+            }
+        } catch (Exception e) {
+            errorService.save(e);
+            throw e;
+        }
+
+        return facturaResponse;
     }
 
-    @Recover
-    public String retryExampleRecovery(DomainExceptionCuentaNoExiste t, String s) {
-        LOGGER.info("Retry Recovery - " + t.getMessage());
-        return "Retry Recovery OK!";
-    }
-
-
-    @Retryable(value = {DomainExceptionCuentaNoExiste.class}, maxAttempts = 4, backoff = @Backoff(1000))
-    public String consultaFactura(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
-
-        throw new DomainExceptionCuentaNoExiste();
-
-    }
-
-    public ResponseEntity<FacturaResponse> consultafactura2(FacturaRequest facturaRequest, DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
-        return null;
-    }
-
-    private PagoFacturaResponse enviarPagoEvertec(AuthModel authModel, Boolean validaSinRegistrar) {
+    private PagoFacturaResponse enviarPagoEvertec(AuthModel authModel, Boolean validaSinRegistrar, Boolean validarEstadoCuenta) {
         PagoFacturaResponse pagoFacturaResponse;
         WebClient webClient = WebClient.create(URL_RECAUDO);
 
@@ -109,7 +130,8 @@ public class FacturaEvertecService {
                 codigoBanco,
                 authModel.getRequestid() + "",
                 authModel.getTotal(),
-                authModel.getFecha()
+                authModel.getFecha(),
+                validarEstadoCuenta ? "S" : "N"
         );
 
         try {
@@ -155,7 +177,6 @@ public class FacturaEvertecService {
         }
         return pagoFacturaResponse;
     }
-
 
     public FacturaResponse consultarFactura(FacturaRequest facturaRequest) {
         FacturaResponse facturaResponse;
@@ -259,7 +280,7 @@ public class FacturaEvertecService {
 
                 update(authModel);
                 if (authModel.getEstado().trim().equals(Constantes.APPROVED)) {
-                    pagoFacturaResponse = enviarPagoEvertec(authModel, false);
+                    pagoFacturaResponse = enviarPagoEvertec(authModel, false, false);
                 }
             } else {
                 if (porCron) {
@@ -309,14 +330,14 @@ public class FacturaEvertecService {
         AuthModel authModel = consulta(new IdRecaudoModel(pagoRequest.getId()));
         PagoFacturaResponse pagoFacturaResponse = null;
         if (authModel != null) {
-            pagoFacturaResponse = enviarPagoEvertec(authModel, true);
+            pagoFacturaResponse = enviarPagoEvertec(authModel, true, false);
         }
 
         return pagoFacturaResponse;
     }
 
     public PagoFacturaResponse enviarPagoAutorizadoPorCron(AuthModel authModel) {
-        PagoFacturaResponse pagoFacturaResponse = enviarPagoEvertec(authModel, true);
+        PagoFacturaResponse pagoFacturaResponse = enviarPagoEvertec(authModel, true, true);
 
         return pagoFacturaResponse;
     }
@@ -360,7 +381,7 @@ public class FacturaEvertecService {
 
     public void seleccionarPagosAprobadosSinRegistrar(ValueStringDomain fecha) {
         List<AuthModel> authModels = authRepository.findByEstadoPagoConfirmado(
-                    Constantes.APPROVED, "N", fecha.getValue().concat("%"));
+                Constantes.APPROVED, "N", fecha.getValue().concat("%"));
 
         authModels.forEach(authModel -> {
             try {
@@ -431,7 +452,7 @@ public class FacturaEvertecService {
                 authModel.setAutorizacion(pagoResponse.getRequest().getPayment().getAuthorization());
 
                 if (authModel.getEstado().trim().equals(Constantes.APPROVED)) {
-                   enviarPagoEvertec(authModel, false);
+                   enviarPagoEvertec(authModel, false, false);
                 } else {
                     update(authModel);
                 }

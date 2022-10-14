@@ -44,7 +44,8 @@ public abstract class ValueIdDomain implements Serializable {
     private String validar(String value) {
         String resultado;
         if(value!= null && !value.equals("")){
-            resultado = validarCaracteresRestringidos(value);
+            //resultado = validarCaracteresRestringidos(value);
+            resultado = value;
         }else {
             resultado = value;
         }

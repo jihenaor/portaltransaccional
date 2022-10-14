@@ -14,4 +14,5 @@ public class PagoFacturaEvertecRequest {
     private final String requestid;
     private final long total;
     private final String fecha;
+    private final String validarEstadoCuenta;
 }
