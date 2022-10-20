@@ -37,3 +37,5 @@ recaudo.db
 *.db
 *.log
 *.log
+recaudo.db
+*.db
