@@ -28,6 +28,9 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 	@Value("#{'${jms.jwt.excluded.rutasadministrador}'.split(',')}")
 	private List<String> rutas_administrador;
 
+	@Value("#{'${jms.jwt.excluded.rutasbanco}'.split(',')}")
+	private List<String> rutas_banco;
+
 	@Autowired
 	private JwtIO jwtIO;
 
@@ -50,10 +53,19 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 
 			UserModel userModel1 = new Gson().fromJson(jwtIO.getPayload(token), UserModel.class);
 
-			if (userModel1.getPerfil().equals("ADMINISTRADOR") && !excluded(rutas_administrador, uri)) {
-				validate = false;
-			} else {
-				validate = !jwtIO.validateToken(token);
+			switch (userModel1.getPerfil()) {
+				case "ADMINISTRADOR":
+					if (!excluded(rutas_administrador, uri)) {
+						validate = false;
+					}
+					break;
+				case "BANCO":
+					if (excluded(rutas_banco, uri)) {
+						validate = true;
+					}
+					break;
+				default:
+					validate = !jwtIO.validateToken(token);
 			}
 		}
 

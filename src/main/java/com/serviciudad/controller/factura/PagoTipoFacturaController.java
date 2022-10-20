@@ -59,7 +59,7 @@ public final class PagoTipoFacturaController {
                     }),
     })
 
-    @RequestMapping(value = "/pagarfacturatipo", method = RequestMethod.POST)
+    @RequestMapping(value = "/pagartipofactura", method = RequestMethod.POST)
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<PagoFacturaResponse> pagarfactura(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(

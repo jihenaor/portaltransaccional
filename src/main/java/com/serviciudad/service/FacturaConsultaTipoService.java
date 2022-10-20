@@ -62,6 +62,7 @@ public final class FacturaConsultaTipoService {
         } else {
             facturaResponse.setFacturavencida("N");
         }
+        facturaResponse.setTipofact(Integer.parseInt(facturaTipoRequest.getTipoFactura()));
 
         return facturaResponse;
     }
