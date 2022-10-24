@@ -1,7 +1,6 @@
 package com.serviciudad.security;
 
 import com.google.gson.Gson;
-import com.serviciudad.controller.ActualizarDiarioController;
 import com.serviciudad.entity.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,10 +24,10 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 	@Value("#{'${jms.jwt.excluded.path}'.split(',')}")
 	private List<String> excluded;
 
-	@Value("#{'${jms.jwt.excluded.rutasadministrador}'.split(',')}")
+	@Value("#{'${jms.jwt.included.rutasadministrador}'.split(',')}")
 	private List<String> rutas_administrador;
 
-	@Value("#{'${jms.jwt.excluded.rutasbanco}'.split(',')}")
+	@Value("#{'${jms.jwt.included.rutasbanco}'.split(',')}")
 	private List<String> rutas_banco;
 
 	@Autowired
@@ -43,7 +42,7 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 		boolean validate = false;
 		String uri = request.getRequestURI();
 
-		if (uri.contains(AUTH_PATH) || excluded(excluded, uri) || uri.contains(SWAGGER_PATH)) {
+		if (uri.contains(AUTH_PATH) || included(excluded, uri) || uri.contains(SWAGGER_PATH)) {
 			validate = true;
 		}
 
@@ -55,14 +54,10 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 
 			switch (userModel1.getPerfil()) {
 				case "ADMINISTRADOR":
-					if (!excluded(rutas_administrador, uri)) {
-						validate = false;
-					}
+					validate = included(rutas_administrador, uri);
 					break;
 				case "BANCO":
-					if (excluded(rutas_banco, uri)) {
-						validate = true;
-					}
+					validate = included(rutas_banco, uri);
 					break;
 				default:
 					validate = !jwtIO.validateToken(token);
@@ -77,7 +72,7 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 		return validate;
 	}
 
-	private boolean excluded(List<String> excludeds, String path) {
+	private boolean included(List<String> excludeds, String path) {
 
 		boolean result = false;
 
@@ -85,6 +80,7 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 
 			if(!exc.equals("#") && path.contains(exc)) {
 				result = true;
+				break;
 			}
 		}
 
