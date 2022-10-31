@@ -47,10 +47,22 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 		}
 
 		if(!validate && request.getHeader("Authorization") != null && !request.getHeader("Authorization") .isEmpty()) {
+			UserModel userModel1;
 
 			String token = request.getHeader("Authorization") .replace("Bearer ", "");
 
-			UserModel userModel1 = new Gson().fromJson(jwtIO.getPayload(token), UserModel.class);
+			validate = !jwtIO.validateToken(token);
+
+			if (!validate) {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+				return validate;
+			}
+			try {
+				userModel1 = new Gson().fromJson(jwtIO.getPayload(token), UserModel.class);
+			} catch (io.fusionauth.jwt.InvalidJWTException invalidJWTException) {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+				return validate;
+			}
 
 			switch (userModel1.getPerfil()) {
 				case "ADMINISTRADOR":
@@ -59,8 +71,6 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 				case "BANCO":
 					validate = included(rutas_banco, uri);
 					break;
-				default:
-					validate = !jwtIO.validateToken(token);
 			}
 		}
 
