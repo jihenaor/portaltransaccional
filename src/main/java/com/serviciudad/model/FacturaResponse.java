@@ -16,6 +16,7 @@ public class FacturaResponse {
     private Integer tipofact;
     @Schema(description = "Valor del la última factura")
     private Long totalfactura;
+    @Schema(description = "Fecha maxima de pago")
     private String fechapago;
     private String status;
     @Schema(description = "Estado del pago", example = "S pago aplicado, N pago no aplicado")

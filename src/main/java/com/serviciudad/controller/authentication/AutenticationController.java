@@ -48,17 +48,16 @@ public class AutenticationController {
     @RequestMapping(value = "/oauth/cliente_credential/accesstoken", method = RequestMethod.POST)
     public ResponseEntity<Object> login(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Permite validar si un usuario tiene autorización para usar las APIS y obtiene con respuesta un JWT",
+                    description = "Permite validar si un usuario tiene autorización para usar las APIS y obtiene como respuesta un JWT",
                     content = @Content(
                             examples = @ExampleObject( name = "usuario",
-                                    value = "{\"usuario\": \"recaudador\", \"contrasena\": \"Ka38%C#u6b$k\"}",
+                                    value = "{\"usuario\": \"codigo-usuario-recaudador\", \"contrasena\": \"Ka38%C#u6b$k\"}",
                                     summary = "Ejemplo JSON autenticacion")
                     )
             )
             @RequestBody Request request
 
     ) throws ApiUnauthorized {
-
         return ResponseEntity.ok(
                 authenticationService.login(
                         request.getUsuario(),
@@ -73,6 +72,8 @@ public class AutenticationController {
 @Setter
 @NoArgsConstructor
 final class Request {
+    @Schema(description = "Codigo del usuario", example = "codigo-usuario-recaudador")
     private String usuario;
+    @Schema(description = "Contraseña", example = "Ka38%C#u6b$k")
     private String contrasena;
 }

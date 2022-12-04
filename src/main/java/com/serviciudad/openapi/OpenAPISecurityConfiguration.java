@@ -22,11 +22,11 @@ import org.springframework.context.annotation.Configuration;
                 ),
                 termsOfService = "${tos.uri}",
                 description = "${api.description}"
+        ),
+        servers = @Server(
+                url = "https://www.serviciudadpse.com/portaltransaccional/",
+                description = "Production"
         )
-//        servers = @Server(
-//                url = "${api.server.url}",
-//                description = "Production"
-//        )
 )
 
 @SecurityScheme(
