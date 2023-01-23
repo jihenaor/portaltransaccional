@@ -58,7 +58,12 @@ public final class FacturaConsultaTipoService {
             Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
             Integer fechaActual = Integer.parseInt(dateFormat.format(new Date()));
 
-            facturaResponse.setFacturavencida(fechaActual > fechaPago ? "S" : "N");
+
+            if (facturaTipoRequest.getTipoFactura().equals("3") || facturaTipoRequest.getTipoFactura().equals("03")) {
+                facturaResponse.setFacturavencida("N");
+            } else {
+                facturaResponse.setFacturavencida(fechaActual > fechaPago ? "S" : "N");
+            }
         } else {
             facturaResponse.setFacturavencida("N");
         }
