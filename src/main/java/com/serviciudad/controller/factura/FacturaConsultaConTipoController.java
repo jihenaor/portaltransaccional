@@ -43,7 +43,7 @@ public final class FacturaConsultaConTipoController {
                     description = "Permite consultar el saldo de la ultima factura de un tipo especifico para una cuenta",
                     content = @Content(
                             examples = @ExampleObject( name = "usuario",
-                                    value = "{\"codsuscrip\": \"808085\", \"tipoFactura\": \"0\"}",
+                                    value = "{\"codsuscrip\": \"808085\", \"tipoFactura\": \"0\", \"numerofactura\": \"271356293\", \"valor\": \"0\"}",
                                     summary = "Ejemplo JSON consulta")
                     )
             )

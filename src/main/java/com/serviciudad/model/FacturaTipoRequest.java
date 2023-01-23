@@ -14,8 +14,20 @@ public class FacturaTipoRequest {
     @Schema(description = "Tipo de factura. Caracteres del 21 al 25 en el codigo de barras")
         private String tipoFactura;
 
+    @Schema(description = "Numero de la factura")
+    private String numerofactura;
+
+    @Schema(description = "Valor de la factura")
+    private Long valor;
+
     public FacturaTipoRequest(String codsuscrip, String tipoFactura) {
         this.codsuscrip = codsuscrip;
         this.tipoFactura = tipoFactura;
+    }
+    public FacturaTipoRequest(String codsuscrip, String tipoFactura, String numerofactura, Long valor) {
+        this.codsuscrip = codsuscrip;
+        this.tipoFactura = tipoFactura;
+        this.numerofactura = numerofactura;
+        this.valor = valor;
     }
 }
