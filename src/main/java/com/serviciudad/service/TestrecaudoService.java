@@ -1,6 +1,7 @@
 package com.serviciudad.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,9 +14,8 @@ public final class TestrecaudoService {
     @Autowired
     private UtilService utilService;
 
-
-    private final String URL_RECAUDO = "http://192.168.100.72:8080/recaudos/api";
-
+    @Value("${url_recaudo}")
+    private String URL_RECAUDO;
 
     public String testRecaudo(String msg) {
         WebClient webClient = WebClient.create(URL_RECAUDO);

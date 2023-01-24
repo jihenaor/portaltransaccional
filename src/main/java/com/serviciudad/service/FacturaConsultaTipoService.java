@@ -52,21 +52,23 @@ public final class FacturaConsultaTipoService {
             errorService.save(e, "", "Consultando la factura");
             throw e;
         }
-
+        facturaResponse.setFacturavencida("N");
+        /*
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
             Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
             Integer fechaActual = Integer.parseInt(dateFormat.format(new Date()));
 
-
-            if (facturaTipoRequest.getTipoFactura().equals("3") || facturaTipoRequest.getTipoFactura().equals("03")) {
-                facturaResponse.setFacturavencida("N");
-            } else {
+            if (facturaTipoRequest.getTipoFactura().equals("0")
+                    || facturaTipoRequest.getTipoFactura().equals("00")) {
                 facturaResponse.setFacturavencida(fechaActual > fechaPago ? "S" : "N");
+            } else {
+                facturaResponse.setFacturavencida("N");
             }
         } else {
             facturaResponse.setFacturavencida("N");
         }
+        */
         facturaResponse.setTipofact(Integer.parseInt(facturaTipoRequest.getTipoFactura()));
 
         return facturaResponse;
