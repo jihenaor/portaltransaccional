@@ -6,6 +6,7 @@ import com.serviciudad.model.PagoFacturaResponse;
 import com.serviciudad.model.PagoTipoFacturaRequest;
 import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.PagarTipoFacturaService;
+import com.serviciudad.service.RequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -25,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 public final class PagoTipoFacturaController {
     @Autowired
     private PagarTipoFacturaService pagarTipoFacturaService;
+
+    @Autowired
+    RequestService requestService;
 
     @Autowired
     private ErrorService errorService;
@@ -85,7 +89,18 @@ public final class PagoTipoFacturaController {
 
             @RequestBody PagoTipoFacturaRequest pagoTipoFacturaRequest) {
         try {
-            return ResponseEntity.ok().body(pagarTipoFacturaService.enviarPago(pagoTipoFacturaRequest));
+            PagoFacturaResponse pagoFacturaResponse = pagarTipoFacturaService.enviarPago(pagoTipoFacturaRequest);
+            try {
+                requestService.save(pagoTipoFacturaRequest.getCodsuscrip(),
+                        pagoTipoFacturaRequest.getNumerofactura(),
+                        pagoTipoFacturaRequest.getTipoFactura(),
+                        pagoFacturaResponse.getCodigoRespuesta(),
+                        pagoFacturaResponse.getComentario());
+            } catch (Exception e2) {
+
+            }
+
+            return ResponseEntity.ok().body(pagoFacturaResponse);
         } catch (Exception e) {
             errorService.save(e);
             return ResponseEntity.internalServerError().body(null);

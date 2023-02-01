@@ -52,8 +52,7 @@ public final class FacturaConsultaTipoService {
             errorService.save(e, "", "Consultando la factura");
             throw e;
         }
-        facturaResponse.setFacturavencida("N");
-        /*
+
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
             Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
@@ -68,7 +67,7 @@ public final class FacturaConsultaTipoService {
         } else {
             facturaResponse.setFacturavencida("N");
         }
-        */
+
         facturaResponse.setTipofact(Integer.parseInt(facturaTipoRequest.getTipoFactura()));
 
         return facturaResponse;
