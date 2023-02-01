@@ -3,6 +3,7 @@ package com.serviciudad.controller.factura;
 import com.serviciudad.model.FacturaResponse;
 import com.serviciudad.model.FacturaTipoRequest;
 import com.serviciudad.service.FacturaConsultaTipoService;
+import com.serviciudad.service.RequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 public final class FacturaConsultaConTipoController {
     @Autowired
     private FacturaConsultaTipoService facturaConsultaTipoService;
+
+    @Autowired
+    RequestService requestService;
 
     @Operation(summary = "Consulta el estado de una cuenta por tipo de factura")
     @ApiResponses(value = {
@@ -50,7 +54,19 @@ public final class FacturaConsultaConTipoController {
             @RequestBody FacturaTipoRequest facturaTipoRequest) {
 
         try {
-            return ResponseEntity.ok().body(facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest));
+            FacturaResponse facturaResponse = facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest)
+            try {
+                requestService.save(facturaTipoRequest.getCodsuscrip() == null ? "N/A" : facturaTipoRequest.getCodsuscrip(),
+                        facturaTipoRequest.getNumerofactura(),
+                        facturaTipoRequest.getTipoFactura(),
+                        facturaResponse.getCodRespuesta().toString(),
+                        "D:" + facturaResponse.getDescripcion() +
+                                "V: "+ facturaResponse.getFacturavencida());
+            } catch (Exception e2) {
+
+            }
+
+            return ResponseEntity.ok().body(facturaResponse);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(null);
         }
