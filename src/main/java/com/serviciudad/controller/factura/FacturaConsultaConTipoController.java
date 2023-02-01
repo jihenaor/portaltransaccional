@@ -59,9 +59,10 @@ public final class FacturaConsultaConTipoController {
                 requestService.save(facturaTipoRequest.getCodsuscrip() == null ? "N/A" : facturaTipoRequest.getCodsuscrip(),
                         facturaTipoRequest.getNumerofactura(),
                         facturaTipoRequest.getTipoFactura(),
+                        "",
                         facturaResponse.getCodRespuesta().toString(),
                         "D:" + facturaResponse.getDescripcion() +
-                                "V: "+ facturaResponse.getFacturavencida());
+                                " V: "+ facturaResponse.getFacturavencida());
             } catch (Exception e2) {
 
             }

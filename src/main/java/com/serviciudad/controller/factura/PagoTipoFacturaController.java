@@ -94,6 +94,7 @@ public final class PagoTipoFacturaController {
                 requestService.save(pagoTipoFacturaRequest.getCodsuscrip(),
                         pagoTipoFacturaRequest.getNumerofactura(),
                         pagoTipoFacturaRequest.getTipoFactura(),
+                        pagoTipoFacturaRequest.getBanco(),
                         pagoFacturaResponse.getCodigoRespuesta(),
                         pagoFacturaResponse.getComentario());
             } catch (Exception e2) {

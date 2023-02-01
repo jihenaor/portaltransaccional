@@ -11,6 +11,7 @@ import java.util.List;
 
 @Repository
 public interface RequestRepository extends CrudRepository<RequestModel, String> {
-
+    @Query("Select b from RequestModel b where b.codsuscrip = :codsuscrip")
+    public List<RequestModel> findByCodsuscrip(@Param("codsuscrip") String codsuscrip);
 
 }

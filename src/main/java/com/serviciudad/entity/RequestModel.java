@@ -27,12 +27,13 @@ public final class RequestModel {
     private String banco;
     private String codigoRespuesta;
     private String comentario;
-    private String fecha;
     private long total;
+    private String fecha;
 
     public RequestModel(String codsuscrip,
                         String numerofactura,
                         String tipoFactura,
+                        String banco,
                         String codigoRespuesta,
                         String comentario) {
         this.id = UUID.randomUUID().toString();
@@ -40,6 +41,7 @@ public final class RequestModel {
         this.codsuscrip = codsuscrip;
         this.numerofactura = numerofactura;
         this.tipoFactura = tipoFactura;
+        this.banco = banco;
         this.codigoRespuesta = codigoRespuesta;
         this.comentario = comentario;
 
