@@ -54,7 +54,7 @@ public final class FacturaConsultaConTipoController {
             @RequestBody FacturaTipoRequest facturaTipoRequest) {
 
         try {
-            FacturaResponse facturaResponse = facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest)
+            FacturaResponse facturaResponse = facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest);
             try {
                 requestService.save(facturaTipoRequest.getCodsuscrip() == null ? "N/A" : facturaTipoRequest.getCodsuscrip(),
                         facturaTipoRequest.getNumerofactura(),
