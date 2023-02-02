@@ -117,7 +117,7 @@ public final class PagoTipoFacturaController {
                     pagoTipoFacturaRequest.getBanco(),
                     codigoRespuesta,
                     comentario,
-                    0L
+                    pagoTipoFacturaRequest.getTotal()
                 );
         } catch (Exception e2) {
 
