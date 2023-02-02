@@ -45,6 +45,6 @@ public final class RequestModel {
         this.banco = banco;
         this.codigoRespuesta = codigoRespuesta;
         this.comentario = comentario;
-
+        this.total = total;
     }
 }
