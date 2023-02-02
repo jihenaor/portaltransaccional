@@ -55,21 +55,38 @@ public final class FacturaConsultaConTipoController {
 
         try {
             FacturaResponse facturaResponse = facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest);
-            try {
-                requestService.save(facturaTipoRequest.getCodsuscrip() == null ? "N/A" : facturaTipoRequest.getCodsuscrip(),
-                        facturaTipoRequest.getNumerofactura(),
-                        facturaTipoRequest.getTipoFactura(),
-                        "",
-                        facturaResponse.getCodRespuesta().toString(),
-                        "D:" + facturaResponse.getDescripcion() +
-                                " V: "+ facturaResponse.getFacturavencida());
-            } catch (Exception e2) {
 
-            }
+            grabarRequest(facturaTipoRequest,
+                    facturaResponse.getCodRespuesta().toString(),
+                    "D:" + facturaResponse.getDescripcion() +
+                            " V: "+ facturaResponse.getFacturavencida(),
+                            facturaResponse.getTotalfactura());
 
             return ResponseEntity.ok().body(facturaResponse);
         } catch (Exception e) {
+            grabarRequest(facturaTipoRequest,
+                    "ERR",
+                    e.getMessage(),
+                    0L);
+
             return ResponseEntity.internalServerError().body(null);
+        }
+    }
+
+    private void grabarRequest(FacturaTipoRequest facturaTipoRequest,
+                               String codigoRespuesta,
+                               String comentario,
+                               Long total) {
+        try {
+            requestService.save(facturaTipoRequest.getCodsuscrip() == null ? "N/A" : facturaTipoRequest.getCodsuscrip(),
+                    facturaTipoRequest.getNumerofactura(),
+                    facturaTipoRequest.getTipoFactura(),
+                    "",
+                    codigoRespuesta,
+                    comentario,
+                    total);
+        } catch (Exception e2) {
+
         }
     }
 }

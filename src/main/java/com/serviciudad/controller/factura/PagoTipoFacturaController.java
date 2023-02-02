@@ -83,28 +83,44 @@ public final class PagoTipoFacturaController {
                                             value = "{\"codsuscrip\": \"810056\", \"numerofactura\": \"123456\", \"tipoFactura\": \"00\", \"banco\": \"0\", \"total\": 30000, \"fecha\": \"AAAA-MM-DD hh:mm:ss\"}",
                                             summary = "Se espera recaudo valido"),
                             }
-
                     )
             )
 
             @RequestBody PagoTipoFacturaRequest pagoTipoFacturaRequest) {
         try {
             PagoFacturaResponse pagoFacturaResponse = pagarTipoFacturaService.enviarPago(pagoTipoFacturaRequest);
-            try {
-                requestService.save(pagoTipoFacturaRequest.getCodsuscrip(),
-                        pagoTipoFacturaRequest.getNumerofactura(),
-                        pagoTipoFacturaRequest.getTipoFactura(),
-                        pagoTipoFacturaRequest.getBanco(),
-                        pagoFacturaResponse.getCodigoRespuesta(),
-                        pagoFacturaResponse.getComentario());
-            } catch (Exception e2) {
-
-            }
+            grabarRequest(pagoTipoFacturaRequest,
+                    pagoFacturaResponse.getCodigoRespuesta(),
+                    pagoFacturaResponse.getComentario());
 
             return ResponseEntity.ok().body(pagoFacturaResponse);
         } catch (Exception e) {
+            try {
+                grabarRequest(pagoTipoFacturaRequest,
+                        "ERR",
+                        e.getMessage());
+            } catch (Exception e2) {
+
+            }
             errorService.save(e);
             return ResponseEntity.internalServerError().body(null);
+        }
+    }
+
+    private void grabarRequest(PagoTipoFacturaRequest pagoTipoFacturaRequest,
+                               String codigoRespuesta,
+                               String comentario) {
+        try {
+            requestService.save(pagoTipoFacturaRequest.getCodsuscrip(),
+                    pagoTipoFacturaRequest.getNumerofactura(),
+                    pagoTipoFacturaRequest.getTipoFactura(),
+                    pagoTipoFacturaRequest.getBanco(),
+                    codigoRespuesta,
+                    comentario,
+                    0L
+                );
+        } catch (Exception e2) {
+
         }
     }
 }

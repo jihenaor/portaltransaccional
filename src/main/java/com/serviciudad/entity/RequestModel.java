@@ -35,7 +35,8 @@ public final class RequestModel {
                         String tipoFactura,
                         String banco,
                         String codigoRespuesta,
-                        String comentario) {
+                        String comentario,
+                        Long total) {
         this.id = UUID.randomUUID().toString();
         this.fecha = (new Date()).toString();
         this.codsuscrip = codsuscrip;

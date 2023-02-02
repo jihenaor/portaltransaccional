@@ -28,13 +28,15 @@ public class RequestService {
                      String tipoFactura,
                      String banco,
                      String codigoRespuesta,
-                     String comentario) {
+                     String comentario,
+                     Long total) {
         requestRepository.save(new RequestModel(codsuscrip,
                 numerofactura,
                 tipoFactura,
                 banco,
                 codigoRespuesta,
-                comentario));
+                comentario,
+                total));
     }
 
     public List<RequestModel> findByCodsuscrip(String codsuscrip) {
