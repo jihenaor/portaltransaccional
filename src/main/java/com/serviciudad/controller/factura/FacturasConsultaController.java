@@ -3,22 +3,25 @@ package com.serviciudad.controller.factura;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.FacturaRequest;
 import com.serviciudad.model.FacturaResponse;
+import com.serviciudad.service.FacturaConsultasService;
 import com.serviciudad.service.FacturaEvertecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin(origins  = "*" )
 @RequestMapping("/api")
-public final class FacturaConsultaSinTipoController {
+public final class FacturasConsultaController {
     @Autowired
-    private FacturaEvertecService facturaService;
+    private FacturaConsultasService facturaConsultasService;
 
-    @RequestMapping(value = "/consultafactura", method = RequestMethod.POST)
-    public ResponseEntity<FacturaResponse> consultafactura(@RequestBody FacturaRequest facturaRequest) {
+    @RequestMapping(value = "/consultafacturas", method = RequestMethod.POST)
+    public ResponseEntity<List<FacturaResponse>> consultafactura(@RequestBody FacturaRequest facturaRequest) {
         try {
-            return ResponseEntity.ok().body(facturaService.consultaFactura(facturaRequest));
+            return ResponseEntity.ok().body(facturaConsultasService.consultarFacturas(facturaRequest));
         } catch (DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
