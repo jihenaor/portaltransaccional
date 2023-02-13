@@ -5,6 +5,7 @@ import com.serviciudad.model.PagoFacturaEvertecRequest;
 import com.serviciudad.model.PagoFacturaResponse;
 import com.serviciudad.model.PagoTipoFacturaRequest;
 import com.serviciudad.service.ErrorService;
+import com.serviciudad.service.MyService;
 import com.serviciudad.service.PagarTipoFacturaService;
 import com.serviciudad.service.RequestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,10 @@ public final class PagoTipoFacturaController {
     @Autowired
     private ErrorService errorService;
 
+    private final String KEY = "RECTIPO-";
+
+    @Autowired
+    private MyService myService;
     @Operation(summary = "Registrar pago por tipo de factura")
     @ApiResponses(value = {
             @ApiResponse(
@@ -87,12 +92,17 @@ public final class PagoTipoFacturaController {
             )
 
             @RequestBody PagoTipoFacturaRequest pagoTipoFacturaRequest) {
+
+        if (myService.existeLlave(getKey(pagoTipoFacturaRequest.getNumerofactura()))) {
+            errorService.save(new Exception("El id proceso ya esta en curso factura" + pagoTipoFacturaRequest.getNumerofactura()));
+            return ResponseEntity.internalServerError().build();
+        }
+
         try {
             PagoFacturaResponse pagoFacturaResponse = pagarTipoFacturaService.enviarPago(pagoTipoFacturaRequest);
             grabarRequest(pagoTipoFacturaRequest,
                     pagoFacturaResponse.getCodigoRespuesta(),
                     pagoFacturaResponse.getComentario());
-
             return ResponseEntity.ok().body(pagoFacturaResponse);
         } catch (Exception e) {
             try {
@@ -122,5 +132,9 @@ public final class PagoTipoFacturaController {
         } catch (Exception e2) {
 
         }
+    }
+
+    private String getKey(String id) {
+        return KEY.concat(id);
     }
 }

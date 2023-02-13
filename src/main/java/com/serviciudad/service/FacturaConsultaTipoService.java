@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public final class FacturaConsultaTipoService {
@@ -37,20 +38,34 @@ public final class FacturaConsultaTipoService {
     private String URL_RECAUDO;
 
     public FacturaResponse consultarFacturaTipo(FacturaTipoRequest facturaTipoRequest) {
-        FacturaResponse facturaResponse;
+        FacturaResponse facturaResponse = null;
         WebClient webClient = WebClient.create(URL_RECAUDO);
-        try {
-            facturaResponse = webClient.post()
-                    .uri("/rec/consultafacturatipo")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(facturaTipoRequest), FacturaRequest.class)
-                    .retrieve()
-                    .bodyToMono(FacturaResponse.class)
-                    .timeout(Duration.ofSeconds(20))  // timeout
-                    .block();
-        } catch (Exception e) {
-            errorService.save(e, "", "Consultando la factura");
-            throw e;
+
+        int limite = 3;
+        for (int cont = 0; cont < limite; cont++) {
+            try {
+                facturaResponse = webClient.post()
+                        .uri("/rec/consultafacturatipo")
+                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .body(Mono.just(facturaTipoRequest), FacturaRequest.class)
+                        .retrieve()
+                        .bodyToMono(FacturaResponse.class)
+                        .timeout(Duration.ofSeconds(20))  // timeout
+                        .block();
+                break;
+            } catch (Exception e) {
+                errorService.save(e, "", "consultarFacturaTipo " + cont + " de " + limite);
+
+                if (cont + 1 == limite) {
+                    throw e;
+                } else {
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
         }
 
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10) {

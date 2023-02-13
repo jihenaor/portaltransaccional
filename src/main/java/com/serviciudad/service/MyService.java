@@ -1,10 +1,10 @@
 package com.serviciudad.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,17 +13,33 @@ public class MyService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    private static Map<String, String> valores = new HashMap<>();
+    private static Map<String, Long> valores = new HashMap<>();
 
-    public synchronized void setValue(String key, String value) {
-        valores.put(key, value);
+
+    public synchronized boolean existeLlave(String key) {
+        Long valor = valores.get(key);
+        boolean existe = false;
+
+        if (valor == null) {
+            valores.put(key, generarFechaActual());
+        } else {
+            existe = true;
+            for(Map.Entry<String, Long> entrada : valores.entrySet()) {
+                if (((generarFechaActual() - entrada.getValue()) / 1000) > 5) {
+                    remove(key);
+                    existe = false;
+                }
+            }
+        }
+        return existe;
     }
 
-    public synchronized String getValue(String key) {
-        return valores.get(key);
+    private long generarFechaActual() {
+        Date fechaActual = new Date();
+        return fechaActual.getTime();
     }
 
-    public synchronized void remove(String key) {
+    private synchronized void remove(String key) {
         valores.remove(key);
     }
 /*

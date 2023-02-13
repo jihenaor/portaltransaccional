@@ -191,7 +191,7 @@ public final class FacturaEvertecService {
                     .timeout(Duration.ofSeconds(20))  // timeout
                     .block();
         } catch (Exception e) {
-            errorService.save(e, "", "Consultando la factura");
+            errorService.save(e, "", "consultarFactura");
             throw e;
         }
 
