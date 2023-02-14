@@ -179,20 +179,33 @@ public final class FacturaEvertecService {
     }
 
     public FacturaResponse consultarFactura(FacturaRequest facturaRequest) {
-        FacturaResponse facturaResponse;
+        FacturaResponse facturaResponse = null;
         WebClient webClient = WebClient.create(URL_RECAUDO);
-        try {
-            facturaResponse = webClient.post()
-                    .uri("/rec")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(facturaRequest), FacturaRequest.class)
-                    .retrieve()
-                    .bodyToMono(FacturaResponse.class)
-                    .timeout(Duration.ofSeconds(20))  // timeout
-                    .block();
-        } catch (Exception e) {
-            errorService.save(e, "", "consultarFactura");
-            throw e;
+        int limite = 3;
+
+        for (int cont = 0; cont < limite; cont++) {
+            try {
+                facturaResponse = webClient.post()
+                        .uri("/rec")
+                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .body(Mono.just(facturaRequest), FacturaRequest.class)
+                        .retrieve()
+                        .bodyToMono(FacturaResponse.class)
+                        .timeout(Duration.ofSeconds(20))  // timeout
+                        .block();
+                break;
+            } catch (Exception e) {
+                errorService.save(e, "", "consultarFactura " + cont + " de " + limite);
+                if (cont + 1 == limite) {
+                    throw e;
+                } else {
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
         }
 
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
