@@ -41,7 +41,7 @@ public final class FacturaConsultaTipoService {
         FacturaResponse facturaResponse = null;
         WebClient webClient = WebClient.create(URL_RECAUDO);
 
-        int limite = 3;
+        int limite = 4;
         for (int cont = 0; cont < limite; cont++) {
             try {
                 facturaResponse = webClient.post()
@@ -54,13 +54,13 @@ public final class FacturaConsultaTipoService {
                         .block();
                 break;
             } catch (Exception e) {
-                errorService.save(e, "", "consultarFacturaTipo " + cont + " de " + limite);
-
                 if (cont + 1 == limite) {
+                    errorService.save(e, "", "consultarFacturaTipo. Cont: " + cont + ".  Cuenta: " + facturaTipoRequest.getCodsuscrip());
+
                     throw e;
                 } else {
                     try {
-                        TimeUnit.SECONDS.sleep(5);
+                        TimeUnit.SECONDS.sleep(7);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
