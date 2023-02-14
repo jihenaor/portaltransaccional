@@ -29,12 +29,12 @@ public final class PagoFacturaEvertecController {
 
     @RequestMapping(value = "/pagarfactura", method = RequestMethod.POST)
     public ResponseEntity<RespuestaResponse> pagarfactura(@RequestBody PagoEvertecRequest pagoRequest) {
-/*
+
         if (myService.existeLlave(getKey(pagoRequest.getId()))) {
             errorService.save(new Exception("El id proceso ya esta en curso " + pagoRequest.getId()));
             return ResponseEntity.internalServerError().build();
         }
-*/
+
         try {
             RespuestaResponse respuestaResponse = facturaService.pagarFactura(Optional.of(new IdRecaudoModel(pagoRequest.getId())),
                     false,
