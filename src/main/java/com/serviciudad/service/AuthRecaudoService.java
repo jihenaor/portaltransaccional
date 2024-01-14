@@ -3,11 +3,9 @@ package com.serviciudad.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serviciudad.compartido.model.ValueStringDomain;
 import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.AuthModel;
 import com.serviciudad.entity.CuentaModel;
-import com.serviciudad.entity.ValidaciomModel;
 import com.serviciudad.exception.DomainExceptionPlaceToPay;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;

@@ -15,6 +15,8 @@ public class UserResponse {
 
 
     public static UserResponse fromAgragate(UserModel userModel) {
-        return new UserResponse(userModel.getLogin(), userModel.getBanco(), userModel.getPerfil());
+        return new UserResponse(userModel.getLogin(),
+                                userModel.getBanco(),
+                                userModel.getPerfil().toString());
     }
 }

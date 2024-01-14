@@ -11,9 +11,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @CrossOrigin(origins  = "*" )
@@ -51,7 +54,7 @@ public final class FacturaConsultaConTipoController {
                                     summary = "Ejemplo JSON consulta")
                     )
             )
-            @RequestBody FacturaTipoRequest facturaTipoRequest) {
+            @Valid @RequestBody FacturaTipoRequest facturaTipoRequest) {
 
         try {
             FacturaResponse facturaResponse = facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest);

@@ -1,31 +1,15 @@
 package com.serviciudad.service;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serviciudad.constantes.Constantes;
 import com.serviciudad.entity.*;
-import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
-import com.serviciudad.exception.DomainExceptionPlaceToPay;
 import com.serviciudad.model.*;
-import com.serviciudad.repository.AuthRepository;
 import com.serviciudad.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public final class UserService {

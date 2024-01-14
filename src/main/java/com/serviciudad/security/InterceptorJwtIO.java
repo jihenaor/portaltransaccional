@@ -65,10 +65,10 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 			}
 
 			switch (userModel1.getPerfil()) {
-				case "ADMINISTRADOR":
+				case ADMINISTRADOR:
 					validate = included(rutas_administrador, uri);
 					break;
-				case "BANCO":
+				case BANCO:
 					validate = included(rutas_banco, uri);
 					break;
 			}

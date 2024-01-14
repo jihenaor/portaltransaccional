@@ -4,7 +4,7 @@ package com.serviciudad.compartido.propiedad;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+
 import org.owasp.encoder.Encode;
 
 import java.nio.charset.Charset;
@@ -34,7 +34,6 @@ public final class LimpiarXSS {
 
         //Sanea el los valores entrada de html y javascript para protecci�n
         //contra XSS
-        value = Jsoup.clean(value, Whitelist.none());
         value = StringEscapeUtils.unescapeHtml4(value);
         value = StringEscapeUtils.unescapeHtml3(value);
         return value;

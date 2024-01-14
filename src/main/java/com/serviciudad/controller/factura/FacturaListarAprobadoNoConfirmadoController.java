@@ -1,7 +1,6 @@
 package com.serviciudad.controller.factura;
 
 import com.serviciudad.entity.AuthModel;
-import com.serviciudad.service.AuthRecaudoService;
 import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.ListarAprobadosNoConfirmadosService;
 import io.swagger.v3.oas.annotations.Operation;

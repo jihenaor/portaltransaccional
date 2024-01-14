@@ -16,7 +16,6 @@ public final class FacturaController {
     @Autowired
     private FacturaEvertecService facturaService;
 
-
     @RequestMapping(value = "/validarevertec/{numerofactura}/{clave}", method = RequestMethod.GET)
     @SecurityRequirement(name = "Bearer Authentication")
     public List<AuthModel> validarevertec(@PathVariable ("numerofactura") String numerofactura,

@@ -55,7 +55,7 @@ public final class FacturaConsultaTipoService {
                 break;
             } catch (Exception e) {
                 if (cont + 1 == limite) {
-                    errorService.save(e, "", "consultarFacturaTipo. Cont: " + cont + ".  Cuenta: " + facturaTipoRequest.getCodsuscrip());
+                    errorService.save(e, "", "consultarFacturaTipo. Cont: " + (cont + 1) +".  Cuenta: " + facturaTipoRequest.getCodsuscrip());
 
                     throw e;
                 } else {
