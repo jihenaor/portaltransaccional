@@ -34,12 +34,12 @@ public final class FacturaConsultaTipoService {
     @Autowired
     private Environment env;
 
-    @Value("${url_recaudo}")
-    private String URL_RECAUDO;
+    @Value("${url_sicesp}")
+    private String URL_SICESP;
 
     public FacturaResponse consultarFacturaTipo(FacturaTipoRequest facturaTipoRequest) {
         FacturaResponse facturaResponse = null;
-        WebClient webClient = WebClient.create(URL_RECAUDO);
+        WebClient webClient = WebClient.create(URL_SICESP);
 
         int limite = 4;
         for (int cont = 0; cont < limite; cont++) {
