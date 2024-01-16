@@ -27,8 +27,6 @@ public final class UserService {
                 s.append(String.format("%02x", aByte));
             }
 
-            System.out.println("Password cifrado: " + s.toString());
-
             return s.toString();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -48,8 +46,6 @@ public final class UserService {
     public Optional<UserResponse> findByLogin(LoginUser login, PasswordUser password)  {
         Optional<UserModel> userModel = userRepository.findById(login.getValue());
         String passwordCifrado = cifrarPasword(password.getValue());
-
-        userModel.ifPresent(model -> System.out.println(model.getPassword() + " - " + passwordCifrado));
 
         return userModel.isPresent() && userModel.get().getPassword().equals(passwordCifrado)
                 ? Optional.of(UserResponse.fromAgragate(userModel.get()))
