@@ -16,29 +16,24 @@ public final class UserService {
     @Autowired
     UserRepository userRepository;
 
-    private String cifrarPasword(String password) {
-        String encryptedpassword = null;
+    public static String cifrarPasword(String password) {
         try {
             MessageDigest m = MessageDigest.getInstance("MD5");
-
             m.update(password.getBytes());
-
             byte[] bytes = m.digest();
 
             StringBuilder s = new StringBuilder();
-            for(int i=0; i< bytes.length ;i++)
-            {
-                s.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            for (byte aByte : bytes) {
+                s.append(String.format("%02x", aByte));
             }
 
-            /* Complete hashed password in hexadecimal format */
-            encryptedpassword = s.toString();
-        }
-        catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+            System.out.println("Password cifrado: " + s.toString());
 
-        return encryptedpassword;
+            return s.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null; // O manejar de otra manera
+        }
     }
 
     public void save(UserModel userModel)  {
@@ -46,15 +41,16 @@ public final class UserService {
         userRepository.save(userModel);
     }
 
-
     public List<UserModel> findAll()  {
         return (List<UserModel>) userRepository.findAll();
     }
 
     public Optional<UserResponse> findByLogin(LoginUser login, PasswordUser password)  {
         Optional<UserModel> userModel = userRepository.findById(login.getValue());
+        String passwordCifrado = cifrarPasword(password.getValue());
 
-        return userModel.isPresent() && userModel.get().getPassword().equals(cifrarPasword(password.getValue()))
+
+        return userModel.isPresent() && userModel.get().getPassword().equals(passwordCifrado)
                 ? Optional.of(UserResponse.fromAgragate(userModel.get()))
                 : Optional.empty();
     }

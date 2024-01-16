@@ -34,7 +34,8 @@ public class AuthService {
 
     public JwtResponse login(String usuario, String contrasena) throws ApiUnauthorized {
 
-        Optional<UserResponse> userResponse = userService.findByLogin(new LoginUser(usuario), new PasswordUser(contrasena));
+        Optional<UserResponse> userResponse = userService.findByLogin(new LoginUser(usuario),
+                new PasswordUser(contrasena));
 
         if (userResponse.isPresent()) {
             JwtResponse jwtResponse = JwtResponse.builder()
