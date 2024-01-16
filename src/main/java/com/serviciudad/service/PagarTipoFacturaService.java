@@ -25,7 +25,7 @@ public final class PagarTipoFacturaService {
 
         try {
             pagoFacturaResponse = webClient.post()
-                    .uri("/rec/pagarfacturatipo")
+                    .uri("/api/pagarfacturatipo")
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(pagoTipoFacturaRequest), FacturaRequest.class)
                     .retrieve()

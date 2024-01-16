@@ -43,6 +43,7 @@ public final class FacturaConsultaTipoService {
 
         int limite = 4;
         for (int cont = 0; cont < limite; cont++) {
+            System.out.println("Consultando: " + cont);
             try {
                 facturaResponse = webClient.post()
                         .uri("/rec/consultafacturatipo")
@@ -60,7 +61,7 @@ public final class FacturaConsultaTipoService {
                     throw e;
                 } else {
                     try {
-                        TimeUnit.SECONDS.sleep(7);
+                        TimeUnit.SECONDS.sleep(3);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
