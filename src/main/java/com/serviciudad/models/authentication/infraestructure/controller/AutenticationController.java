@@ -48,6 +48,7 @@ public class AutenticationController {
             @RequestBody Request request
 
     ) throws ApiUnauthorized {
+        System.out.println("Autenticando");
         return ResponseEntity.ok(
                 authenticationService.login(
                         request.getUsuario(),
