@@ -38,6 +38,7 @@ public class AuthService {
                 new PasswordUser(contrasena));
 
         if (userResponse.isPresent()) {
+            System.out.println("Login OK");
             JwtResponse jwtResponse = JwtResponse.builder()
                     .tokenType("bearer")
                     .accessToken(jwtIO.generateToken(userResponse.get()))
@@ -48,6 +49,7 @@ public class AuthService {
 
             return jwtResponse;
         } else {
+            System.out.println("Login err");
             throw new ApiUnauthorized("Usuario no valido");
         }
     }
