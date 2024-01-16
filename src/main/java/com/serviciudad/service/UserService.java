@@ -49,7 +49,7 @@ public final class UserService {
         Optional<UserModel> userModel = userRepository.findById(login.getValue());
         String passwordCifrado = cifrarPasword(password.getValue());
 
-        System.out.println(userModel.get().getPassword() + " - " + passwordCifrado));
+        System.out.println(userModel.get().getPassword() + " - " + passwordCifrado);
 
         return userModel.isPresent() && userModel.get().getPassword().equals(passwordCifrado)
                 ? Optional.of(UserResponse.fromAgragate(userModel.get()))
