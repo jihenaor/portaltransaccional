@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public final class FacturaConsultaTipoService {
@@ -37,13 +36,16 @@ public final class FacturaConsultaTipoService {
     @Value("${url_sicesp}")
     private String URL_SICESP;
 
+    public FacturaConsultaTipoService() {
+    }
+
     public FacturaResponse consultarFacturaTipo(FacturaTipoRequest facturaTipoRequest) {
         FacturaResponse facturaResponse = null;
         WebClient webClient = WebClient.create(URL_SICESP);
 
-        int limite = 4;
-        for (int cont = 0; cont < limite; cont++) {
-            System.out.println("Consultando: " + cont);
+//        int limite = 4;
+//        for (int cont = 0; cont < limite; cont++) {
+//            System.out.println("Consultando: " + cont);
             try {
                 facturaResponse = webClient.post()
                         .uri("/rec/consultafacturatipo")
@@ -53,26 +55,29 @@ public final class FacturaConsultaTipoService {
                         .bodyToMono(FacturaResponse.class)
                         .timeout(Duration.ofSeconds(20))  // timeout
                         .block();
-                break;
+//                break;
             } catch (Exception e) {
-                if (cont + 1 == limite) {
-                    errorService.save(e, "", "consultarFacturaTipo. Cont: " + (cont + 1) +".  Cuenta: " + facturaTipoRequest.getCodsuscrip());
+//                if (cont + 1 == limite) {
+//                    errorService.save(e, "", "consultarFacturaTipo. Cont: " + (cont + 1) +".  Cuenta: " + facturaTipoRequest.getCodsuscrip());
 
                     throw e;
-                } else {
+  /*              } else {
                     try {
                         TimeUnit.SECONDS.sleep(3);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
                 }
-            }
-        }
 
+   */
+            }
+//        }
+
+        assert facturaResponse != null;
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-            Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
-            Integer fechaActual = Integer.parseInt(dateFormat.format(new Date()));
+            int fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
+            int fechaActual = Integer.parseInt(dateFormat.format(new Date()));
 
             if (facturaTipoRequest.getTipoFactura().equals("0")
                     || facturaTipoRequest.getTipoFactura().equals("00")) {
