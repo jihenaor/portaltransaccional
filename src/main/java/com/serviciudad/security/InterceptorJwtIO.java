@@ -69,9 +69,10 @@ public class InterceptorJwtIO implements HandlerInterceptor {
 					validate = included(rutas_administrador, uri);
 					break;
 				case BANCO:
-					validate = included(rutas_banco, uri);
+                case TESTING:
+                    validate = included(rutas_banco, uri);
 					break;
-			}
+            }
 		}
 
 		if(!validate) {

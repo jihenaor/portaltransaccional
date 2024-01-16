@@ -42,13 +42,14 @@ public final class FacturaConsultaTipoService {
     public FacturaResponse consultarFacturaTipo(FacturaTipoRequest facturaTipoRequest) {
         FacturaResponse facturaResponse = null;
         WebClient webClient = WebClient.create(URL_SICESP);
+        String URI = "/rec/consultafacturatipo";
 
 //        int limite = 4;
 //        for (int cont = 0; cont < limite; cont++) {
 //            System.out.println("Consultando: " + cont);
             try {
                 facturaResponse = webClient.post()
-                        .uri("/rec/consultafacturatipo")
+                        .uri(URI)
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .body(Mono.just(facturaTipoRequest), FacturaRequest.class)
                         .retrieve()
@@ -57,6 +58,8 @@ public final class FacturaConsultaTipoService {
                         .block();
 //                break;
             } catch (Exception e) {
+                System.out.println("Error consultando: "  + URL_SICESP+URI);
+                e.printStackTrace();
 //                if (cont + 1 == limite) {
 //                    errorService.save(e, "", "consultarFacturaTipo. Cont: " + (cont + 1) +".  Cuenta: " + facturaTipoRequest.getCodsuscrip());
 

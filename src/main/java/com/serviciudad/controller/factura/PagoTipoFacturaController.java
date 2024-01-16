@@ -97,13 +97,13 @@ public final class PagoTipoFacturaController {
             errorService.save(new Exception("El id proceso ya esta en curso factura" + pagoTipoFacturaRequest.getNumerofactura()));
             return ResponseEntity.internalServerError().build();
         }
-        System.out.println("pagartipofactura");
+
         try {
             PagoFacturaResponse pagoFacturaResponse = pagarTipoFacturaService.enviarPago(pagoTipoFacturaRequest);
             grabarRequest(pagoTipoFacturaRequest,
                     pagoFacturaResponse.getCodigoRespuesta(),
                     pagoFacturaResponse.getComentario());
-            System.out.println("Ok pagartipofactura");
+
             return ResponseEntity.ok().body(pagoFacturaResponse);
         } catch (Exception e) {
             System.out.println("Err pagartipofactura");

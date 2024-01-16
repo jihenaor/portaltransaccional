@@ -39,7 +39,7 @@ public final class PagarTipoFacturaService {
 
                 }
             }
-            System.out.println("enviarPago");
+
         } catch (Exception e) {
             errorService.save(e, "", "Registrando pago de factura");
             throw e;

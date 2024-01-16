@@ -56,7 +56,7 @@ public final class FacturaConsultaConTipoController {
             )
             @Valid @RequestBody FacturaTipoRequest facturaTipoRequest) {
 
-        try {
+
             FacturaResponse facturaResponse = facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest);
 
             grabarRequest(facturaTipoRequest,
@@ -66,14 +66,7 @@ public final class FacturaConsultaConTipoController {
                             facturaResponse.getTotalfactura());
 
             return ResponseEntity.ok().body(facturaResponse);
-        } catch (Exception e) {
-            grabarRequest(facturaTipoRequest,
-                    "ERR",
-                    e.getMessage(),
-                    0L);
 
-            return ResponseEntity.internalServerError().body(null);
-        }
     }
 
     private void grabarRequest(FacturaTipoRequest facturaTipoRequest,
