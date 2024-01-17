@@ -1,8 +1,11 @@
 package com.serviciudad.service;
 
+import com.serviciudad.compartido.exceptions.BusinessException;
 import com.serviciudad.model.*;
 import com.serviciudad.repository.AuthRepository;
 import com.serviciudad.repository.CronRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -18,6 +21,9 @@ import java.util.Date;
 
 @Service
 public final class FacturaConsultaTipoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(FacturaConsultaTipoService.class);
+
     @Autowired
     AuthRepository authRepository;
 
@@ -39,10 +45,13 @@ public final class FacturaConsultaTipoService {
     public FacturaConsultaTipoService() {
     }
 
-    public FacturaResponse consultarFacturaTipo(FacturaTipoRequest facturaTipoRequest) {
+    public FacturaResponse consultarFacturaTipo(FacturaTipoRequest facturaTipoRequest) throws BusinessException {
         FacturaResponse facturaResponse = null;
         WebClient webClient = WebClient.create(URL_SICESP);
         String URI = "/rec/consultafacturatipo";
+
+
+        validarDatos(facturaTipoRequest);
 
 //        int limite = 4;
 //        for (int cont = 0; cont < limite; cont++) {
@@ -95,5 +104,40 @@ public final class FacturaConsultaTipoService {
         facturaResponse.setTipofact(Integer.parseInt(facturaTipoRequest.getTipoFactura()));
 
         return facturaResponse;
+    }
+
+    private void validarDatos(FacturaTipoRequest facturaTipoRequest) throws BusinessException {
+        String mensajeBussinesError = "Los parámetros de seleccion son incorrectos.";
+
+        if (facturaTipoRequest.getCodsuscrip() == null || facturaTipoRequest.getCodsuscrip().isEmpty()) {
+            logger.error("Código de suscriptor nulo o vacío");
+
+            throw new BusinessException(mensajeBussinesError);
+        }
+
+        if (facturaTipoRequest.getTipoFactura() == null) {
+            logger.error("El tipo de factura no puede ser nulo.");
+            throw new BusinessException(mensajeBussinesError);
+        }
+
+        // Validaciones adicionales dependiendo del tipo de factura
+        switch (facturaTipoRequest.getTipoFactura()) {
+            case "0":
+                break;
+            case "1":
+            case "6":
+                if (facturaTipoRequest.getValor() == 0) {
+                    logger.error("El total no puede ser nulo para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".");
+                }
+                if (facturaTipoRequest.getNumerofactura() == null || facturaTipoRequest.getNumerofactura().isEmpty()) {
+                    logger.error("El número de factura no puede ser nulo o vacío para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".");
+                }
+
+                throw new BusinessException(mensajeBussinesError);
+            default:
+                if (facturaTipoRequest.getNumerofactura() == null || facturaTipoRequest.getNumerofactura().isEmpty()) {
+                    logger.error("El número de factura no puede ser nulo o vacío para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".");
+                }
+        }
     }
 }

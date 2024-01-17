@@ -1,5 +1,6 @@
 package com.serviciudad.controller.factura;
 
+import com.serviciudad.compartido.exceptions.BusinessException;
 import com.serviciudad.model.FacturaResponse;
 import com.serviciudad.model.FacturaTipoRequest;
 import com.serviciudad.service.FacturaConsultaTipoService;
@@ -54,8 +55,7 @@ public final class FacturaConsultaConTipoController {
                                     summary = "Ejemplo JSON consulta")
                     )
             )
-            @Valid @RequestBody FacturaTipoRequest facturaTipoRequest) {
-
+            @Valid @RequestBody FacturaTipoRequest facturaTipoRequest) throws BusinessException {
 
             FacturaResponse facturaResponse = facturaConsultaTipoService.consultarFacturaTipo(facturaTipoRequest);
 
