@@ -15,6 +15,7 @@ public class FacturaTipoRequest {
     @Schema(description = "Numero de la cuenta. Caracteres del 35 al 44 en el codigo de barras")
     @Size(min = 4, max = 20, message = "Error en datos")
     private String codsuscrip;
+
     @Schema(description = "Tipo de factura. Caracteres del 21 al 25 en el codigo de barras")
     @Size(min = 1, max = 2, message = "Error en datos")
     private String tipoFactura;

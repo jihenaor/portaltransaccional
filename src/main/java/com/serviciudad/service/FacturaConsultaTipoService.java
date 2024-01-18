@@ -117,8 +117,9 @@ public final class FacturaConsultaTipoService {
         }
 
         if (facturaTipoRequest.getTipoFactura() == null) {
-            logger.error("El tipo de factura no puede ser nulo."  + facturaTipoRequest.toString());
-            throw new BusinessException(mensajeBussinesError);
+            log += "El tipo de factura no puede ser nulo.";
+            logger.error(  log );
+            throw new BusinessException(mensajeBussinesError + log);
         }
 
         switch (facturaTipoRequest.getTipoFactura()) {
