@@ -53,6 +53,9 @@ public final class FacturaEvertecService {
     @Autowired
     private Environment env;
 
+    @Value("${url_sicesp}")
+    private String URL_SICESP;
+
     @Value("${url_recaudo}")
     private String URL_RECAUDO;
 
@@ -180,38 +183,22 @@ public final class FacturaEvertecService {
 
     public FacturaResponse consultarFactura(FacturaRequest facturaRequest) {
         FacturaResponse facturaResponse = null;
-        WebClient webClient = WebClient.create(URL_RECAUDO);
-        int limite = 3;
+        WebClient webClient = WebClient.create(URL_SICESP);
 
-        for (int cont = 0; cont < limite; cont++) {
-            try {
-                facturaResponse = webClient.post()
-                        .uri("/rec")
-                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .body(Mono.just(facturaRequest), FacturaRequest.class)
-                        .retrieve()
-                        .bodyToMono(FacturaResponse.class)
-                        .timeout(Duration.ofSeconds(20))  // timeout
-                        .block();
-                break;
-            } catch (Exception e) {
-                errorService.save(e, "", "consultarFactura " + cont + " de " + limite);
-                if (cont + 1 == limite) {
-                    throw e;
-                } else {
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        }
+        facturaResponse = webClient.post()
+                .uri("/api/consultafacturatipo")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(facturaRequest), FacturaRequest.class)
+                .retrieve()
+                .bodyToMono(FacturaResponse.class)
+                .timeout(Duration.ofSeconds(20))  // timeout
+                .block();
 
+        assert facturaResponse != null;
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-            Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
-            Integer fechaActual = Integer.parseInt(dateFormat.format(new Date()));
+            int fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
+            int fechaActual = Integer.parseInt(dateFormat.format(new Date()));
 
             facturaResponse.setFacturavencida(fechaActual > fechaPago ? "S" : "N");
         } else {
