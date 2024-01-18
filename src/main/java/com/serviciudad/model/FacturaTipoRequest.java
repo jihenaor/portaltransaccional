@@ -36,4 +36,12 @@ public class FacturaTipoRequest {
         this.numerofactura = numerofactura;
         this.valor = valor;
     }
+
+
+    @Override
+    public String toString() {
+        return String.format(
+                "FacturaTipoRequest{codsuscrip='%s', tipoFactura='%s', numerofactura='%s', valor=%d}",
+                codsuscrip, tipoFactura, numerofactura, valor);
+    }
 }

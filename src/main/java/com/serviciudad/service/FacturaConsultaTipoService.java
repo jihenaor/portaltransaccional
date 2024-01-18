@@ -50,7 +50,6 @@ public final class FacturaConsultaTipoService {
         WebClient webClient = WebClient.create(URL_SICESP);
         String URI = "/rec/consultafacturatipo";
 
-
         validarDatos(facturaTipoRequest);
 
 //        int limite = 4;
@@ -107,7 +106,7 @@ public final class FacturaConsultaTipoService {
     }
 
     private void validarDatos(FacturaTipoRequest facturaTipoRequest) throws BusinessException {
-        String mensajeBussinesError = "Los parametros de seleccion son incorrectos e.";
+        String mensajeBussinesError = "Los parametros de seleccion son incorrectos e." + facturaTipoRequest.toString();
 
         if (facturaTipoRequest.getCodsuscrip() == null || facturaTipoRequest.getCodsuscrip().isEmpty()) {
             logger.error("Código de suscriptor nulo o vacío");
