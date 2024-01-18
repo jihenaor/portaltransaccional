@@ -120,13 +120,12 @@ public final class FacturaConsultaTipoService {
             throw new BusinessException(mensajeBussinesError);
         }
 
-        // Validaciones adicionales dependiendo del tipo de factura
         switch (facturaTipoRequest.getTipoFactura()) {
             case "0":
                 break;
             case "1":
             case "6":
-                if (facturaTipoRequest.getValor() == 0) {
+                if (facturaTipoRequest.getValor() == null || facturaTipoRequest.getValor() == 0) {
                     logger.error("El total no puede ser nulo para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".");
                 }
                 if (facturaTipoRequest.getNumerofactura() == null || facturaTipoRequest.getNumerofactura().isEmpty()) {
