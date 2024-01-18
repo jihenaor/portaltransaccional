@@ -107,7 +107,7 @@ public final class FacturaConsultaTipoService {
     }
 
     private void validarDatos(FacturaTipoRequest facturaTipoRequest) throws BusinessException {
-        String mensajeBussinesError = "Los parámetros de seleccion son incorrectos.";
+        String mensajeBussinesError = "Los parametros de seleccion son incorrectos e.";
 
         if (facturaTipoRequest.getCodsuscrip() == null || facturaTipoRequest.getCodsuscrip().isEmpty()) {
             logger.error("Código de suscriptor nulo o vacío");
@@ -126,7 +126,7 @@ public final class FacturaConsultaTipoService {
             case "1":
             case "6":
                 if (facturaTipoRequest.getValor() == null || facturaTipoRequest.getValor() == 0) {
-                    logger.error("El total no puede ser nulo para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".");
+                    logger.error("El valor no puede ser nulo o cero para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".");
                 }
                 if (facturaTipoRequest.getNumerofactura() == null || facturaTipoRequest.getNumerofactura().isEmpty()) {
                     logger.error("El número de factura no puede ser nulo o vacío para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".");
