@@ -113,13 +113,13 @@ public final class FacturaConsultaTipoService {
             log += "Código de suscriptor nulo o vacío";
             logger.error(log);
 
-            throw new BusinessException(mensajeBussinesError + log);
+            throw new BusinessException(mensajeBussinesError);
         }
 
         if (facturaTipoRequest.getTipoFactura() == null) {
             log += "El tipo de factura no puede ser nulo.";
             logger.error(  log );
-            throw new BusinessException(mensajeBussinesError + log);
+            throw new BusinessException(mensajeBussinesError);
         }
 
         switch (facturaTipoRequest.getTipoFactura()) {
@@ -130,13 +130,15 @@ public final class FacturaConsultaTipoService {
                 if (facturaTipoRequest.getValor() == null || facturaTipoRequest.getValor() == 0) {
                     log += "El valor no puede ser nulo o cero para el tipo de factura "  + facturaTipoRequest.getTipoFactura();
                     logger.error(log);
+                    throw new BusinessException(mensajeBussinesError);
                 }
                 if (facturaTipoRequest.getNumerofactura() == null || facturaTipoRequest.getNumerofactura().isEmpty()) {
                     log += "El número de factura no puede ser nulo o vacío para el tipo de factura " + facturaTipoRequest.getTipoFactura();
                     logger.error(log + "." + facturaTipoRequest.toString());
+                    throw new BusinessException(mensajeBussinesError);
                 }
 
-                throw new BusinessException(mensajeBussinesError + log);
+
             default:
                 if (facturaTipoRequest.getNumerofactura() == null || facturaTipoRequest.getNumerofactura().isEmpty()) {
                     log += "El número de factura no puede ser nulo o vacío para el tipo de factura " + facturaTipoRequest.getTipoFactura() + ".";
