@@ -17,8 +17,9 @@ public final class SessionController {
     @Autowired
     private AuthRecaudoService authService;
 
+
     @RequestMapping(value = "/session", method = RequestMethod.POST)
-    public ResponseEntity<ClientResponse> session(@RequestBody FacturaRequest facturaRequest) {
-        return ResponseEntity.ok().body(authService.auth(facturaRequest));
+    public ResponseEntity<ClientResponse> session(@RequestBody FacturaRequest facturaRequest) throws DomainExceptionPlaceToPay {
+            return ResponseEntity.ok().body(authService.auth(facturaRequest));
     }
 }
