@@ -1,7 +1,6 @@
 package com.serviciudad.controller.factura;
 
 import com.serviciudad.entity.AuthModel;
-import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.ListarAprobadosNoConfirmadosService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -21,19 +20,12 @@ public final class FacturaListarAprobadoNoConfirmadoController {
     @Autowired
     private ListarAprobadosNoConfirmadosService listarAprobadosNoConfirmados;
 
-    @Autowired
-    private ErrorService errorService;
-
     @Operation(summary = "Consulta recaudos en estado: APPROVED, pagoconfirmado: N")
     @RequestMapping(value = "/listaraprobadosnoconfirmados", method = RequestMethod.GET)
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<List<AuthModel>> listar() {
 
-        try {
-            return ResponseEntity.ok().body(listarAprobadosNoConfirmados.listarAprobadosNoConfirmados());
-        } catch (Exception e) {
-            errorService.save(e);
-            return ResponseEntity.internalServerError().body(null);
-        }
+        return ResponseEntity.ok().body(listarAprobadosNoConfirmados.listarAprobadosNoConfirmados());
+
     }
 }

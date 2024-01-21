@@ -1,19 +1,16 @@
 package com.serviciudad.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 @Service
 public final class TestrecaudoService {
-    @Autowired
-    private ErrorService errorService;
-
-    @Autowired
-    private UtilService utilService;
-
     @Value("${url_recaudo}")
     private String URL_RECAUDO;
 
@@ -21,19 +18,25 @@ public final class TestrecaudoService {
         WebClient webClient = WebClient.create(URL_RECAUDO);
         String respuesta = "";
 
-        try {
-            respuesta = webClient.get()
-                    .uri("/rec/" + msg)
-                    .exchange()
-                    .block()
-                    .bodyToMono(String.class)
-                    .block();
+        respuesta = webClient.get()
+                .uri("/rec/" + msg)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
 
-        } catch (Exception e) {
-            respuesta = e.getMessage();
-            errorService.save(e, "", "Testing recaudo");
-            throw e;
-        }
+/*
+        return webClient.post()
+                .uri("/api/consultafacturatipo")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(facturaRequest), FacturaRequest.class)
+                .retrieve()
+                .bodyToMono(Respuestafactura.class)
+                .timeout(Duration.ofSeconds(20))  // timeout
+                .block();
+  */
+
         return respuesta;
     }
 }

@@ -9,6 +9,7 @@ import com.serviciudad.entity.CuentaModel;
 import com.serviciudad.exception.DomainExceptionPlaceToPay;
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.*;
+import com.serviciudad.models.factura.application.ports.FacturaResponse;
 import com.serviciudad.repository.AuthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -37,9 +38,6 @@ public final class AuthRecaudoService {
     private FacturaEvertecService facturaService;
 
     @Autowired
-    private ErrorService errorService;
-
-    @Autowired
     private UtilService utilService;
 
     @Autowired
@@ -50,7 +48,6 @@ public final class AuthRecaudoService {
         ClientResponse clientResponse;
         SessionRequest sessionRequest;
         WebClient webClient;
-        String json = "";
 
         if (existeSessionEnCurso(new CuentaModel(facturaRequest.getCodsuscrip()))) {
             return new ClientResponse();
@@ -58,43 +55,24 @@ public final class AuthRecaudoService {
 
         sessionRequest = getSessionRequest(facturaRequest);
 
-        try {
-            webClient = WebClient.create(env.getProperty("url"));
-        } catch (Exception e) {
-            errorService.save(e);
-            throw e;
-        }
+        webClient = WebClient.create(env.getProperty("url"));
 
         String id = UUID.randomUUID().toString();
         ClientRequest clientRequest = createRequest(sessionRequest, id);
 
         sessionRequest.setSeed(clientRequest.getAuth().getSeed());
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            json = mapper.writeValueAsString(clientRequest);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
 
-        try {
-            clientResponse = webClient.post()
-                    .uri("/session")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                     .body(Mono.just(clientRequest), ClientRequest.class)
-                    .retrieve()
 
-                    .bodyToMono(ClientResponse.class)
-                    .timeout(Duration.ofSeconds(20))  // timeout
-                    .block();
-        } catch (Exception e) {
-            if (e instanceof WebClientResponseException.Unauthorized) {
-                errorService.save(json, "auth");
-            } else {
-                errorService.save(e);
-            }
-            throw new DomainExceptionPlaceToPay();
-        }
+        clientResponse = webClient.post()
+                .uri("/session")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                 .body(Mono.just(clientRequest), ClientRequest.class)
+                .retrieve()
+
+                .bodyToMono(ClientResponse.class)
+                .timeout(Duration.ofSeconds(20))  // timeout
+                .block();
 
         clientResponse = save(sessionRequest, clientResponse, id);
 
@@ -104,14 +82,8 @@ public final class AuthRecaudoService {
     private SessionRequest getSessionRequest(FacturaRequest facturaRequest) throws DomainExceptionCuentaNoExiste {
         FacturaResponse facturaResponse;
         SessionRequest sessionRequest;
-        try {
-            facturaResponse = facturaService.consultaFactura(facturaRequest);
-        } catch (DomainExceptionCuentaNoExiste domainExceptionCuentaNoExiste) {
-            throw domainExceptionCuentaNoExiste;
-        } catch (Exception e) {
-            errorService.save(e);
-            throw e;
-        }
+
+        facturaResponse = facturaService.consultaFactura(facturaRequest);
 
         sessionRequest = new SessionRequest(
                 facturaRequest.getCodsuscrip(),

@@ -2,15 +2,9 @@ package com.serviciudad.controller;
 
 
 import com.serviciudad.compartido.model.ValueStringDomain;
-import com.serviciudad.entity.ValidaciomModel;
-import com.serviciudad.exception.DomainExceptionPlaceToPay;
-import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.entity.AuthModel;
-import com.serviciudad.model.ClientResponse;
-import com.serviciudad.model.FacturaRequest;
 import com.serviciudad.service.AuthRecaudoListarService;
 import com.serviciudad.service.AuthRecaudoService;
-import com.serviciudad.service.ErrorService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,30 +22,17 @@ public final class AuthController {
     @Autowired
     private AuthRecaudoListarService authRecaudoListarService;
 
-    @Autowired
-    private ErrorService errorService;
-
     @RequestMapping(value = "/listarsessiones/{fecha}", method = RequestMethod.GET)
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<List<AuthModel>> listar(@PathVariable("fecha") String fecha) {
 
-        try {
-            return ResponseEntity.ok().body(authRecaudoListarService.listar(new ValueStringDomain(fecha, 10)));
-        } catch (Exception e) {
-            errorService.save(e);
-            return ResponseEntity.internalServerError().body(null);
-        }
+        return ResponseEntity.ok().body(authRecaudoListarService.listar(new ValueStringDomain(fecha, 10)));
     }
 
     @RequestMapping(value = "/listarpendientes", method = RequestMethod.GET)
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<List<AuthModel>> listarpendientes() {
+        return ResponseEntity.ok().body(authService.listarpendientes());
 
-        try {
-            return ResponseEntity.ok().body(authService.listarpendientes());
-        } catch (Exception e) {
-            errorService.save(e);
-            return ResponseEntity.internalServerError().body(null);
-        }
     }
 }

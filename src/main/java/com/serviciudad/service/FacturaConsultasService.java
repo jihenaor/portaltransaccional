@@ -1,11 +1,11 @@
 package com.serviciudad.service;
 
 import com.serviciudad.model.FacturaRequest;
-import com.serviciudad.model.FacturaResponse;
-import com.serviciudad.model.FacturaTipoRequest;
+import com.serviciudad.models.factura.application.ports.FacturaResponse;
 import com.serviciudad.model.FacturasResponse;
 import com.serviciudad.repository.AuthRepository;
 import com.serviciudad.repository.CronRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -15,22 +15,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 public final class FacturaConsultasService {
     @Autowired
     AuthRepository authRepository;
 
     @Autowired
     CronRepository cronRepository;
-
-    @Autowired
-    private ErrorService errorService;
 
     @Autowired
     private UtilService utilService;
@@ -68,7 +64,7 @@ public final class FacturaConsultasService {
                         .block();
                 break;
             } catch (Exception e) {
-                errorService.save(e, "", "consultarFacturasPendientesPago: " + cont + " de " + limite);
+                log.error("consultarFacturasPendientesPago: " + cont + " de " + limite, e);
                 if (cont + 1 == limite) {
                     throw e;
                 } else {

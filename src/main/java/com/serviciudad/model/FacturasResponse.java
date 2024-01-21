@@ -1,6 +1,6 @@
 package com.serviciudad.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.serviciudad.models.factura.application.ports.FacturaResponse;
 import lombok.Getter;
 import lombok.Setter;
 

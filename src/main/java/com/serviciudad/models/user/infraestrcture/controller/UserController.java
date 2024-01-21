@@ -2,7 +2,6 @@ package com.serviciudad.models.user.infraestrcture.controller;
 
 import com.serviciudad.controller.test.ResponseVersion;
 import com.serviciudad.entity.UserModel;
-import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,8 +22,6 @@ public final class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ErrorService errorService;
 
     @Operation(summary = "Adiciona usuario")
     @ApiResponses(value = {
@@ -37,13 +34,7 @@ public final class UserController {
     @SecurityRequirement(name = "Bearer Authentication")
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> adicionarUsuario(@RequestBody UserModel userModel) {
-
-        try {
-            userService.save(userModel);
-            return ResponseEntity.ok().body("OK");
-        } catch (Exception e) {
-            errorService.save(e);
-            return ResponseEntity.internalServerError().body(null);
-        }
+        userService.save(userModel);
+        return ResponseEntity.ok().body("OK");
     }
 }
