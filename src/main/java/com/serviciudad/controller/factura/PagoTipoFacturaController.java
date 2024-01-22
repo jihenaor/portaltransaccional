@@ -1,10 +1,7 @@
 package com.serviciudad.controller.factura;
 
-import com.serviciudad.model.FacturaResponse;
-import com.serviciudad.model.PagoFacturaEvertecRequest;
 import com.serviciudad.model.PagoFacturaResponse;
 import com.serviciudad.model.PagoTipoFacturaRequest;
-import com.serviciudad.service.ErrorService;
 import com.serviciudad.service.MyService;
 import com.serviciudad.service.PagarTipoFacturaService;
 import com.serviciudad.service.RequestService;
@@ -15,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,15 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public final class PagoTipoFacturaController {
     @Autowired
     private PagarTipoFacturaService pagarTipoFacturaService;
 
     @Autowired
     RequestService requestService;
-
-    @Autowired
-    private ErrorService errorService;
 
     private final String KEY = "RECTIPO-";
 
@@ -93,30 +89,20 @@ public final class PagoTipoFacturaController {
 
             @RequestBody PagoTipoFacturaRequest pagoTipoFacturaRequest) {
 
-        if (myService.existeLlave(getKey(pagoTipoFacturaRequest.getNumerofactura()))) {
-            errorService.save(new Exception("El id proceso ya esta en curso factura" + pagoTipoFacturaRequest.getNumerofactura()));
-            return ResponseEntity.internalServerError().build();
-        }
+            if (pagoTipoFacturaRequest.getNumerofactura() == null) {
+                System.out.println("Numero factura es null");
+            }
+            if (myService.existeLlave(getKey(pagoTipoFacturaRequest.getNumerofactura()))) {
+                log.error("El id proceso ya esta en curso factura" + pagoTipoFacturaRequest.getNumerofactura());
+                return ResponseEntity.internalServerError().build();
+            }
 
-        try {
             PagoFacturaResponse pagoFacturaResponse = pagarTipoFacturaService.enviarPago(pagoTipoFacturaRequest);
             grabarRequest(pagoTipoFacturaRequest,
                     pagoFacturaResponse.getCodigoRespuesta(),
                     pagoFacturaResponse.getComentario());
 
             return ResponseEntity.ok().body(pagoFacturaResponse);
-        } catch (Exception e) {
-            System.out.println("Err pagartipofactura");
-            try {
-                grabarRequest(pagoTipoFacturaRequest,
-                        "ERR",
-                        e.getMessage());
-            } catch (Exception e2) {
-
-            }
-            errorService.save(e);
-            return ResponseEntity.internalServerError().body(null);
-        }
     }
 
     private void grabarRequest(PagoTipoFacturaRequest pagoTipoFacturaRequest,

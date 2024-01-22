@@ -13,8 +13,10 @@ import com.serviciudad.exception.DomainExceptionNoEncontradoRequestId;
 import com.serviciudad.model.*;
 import com.serviciudad.modelpago.PagoResponse;
 import com.serviciudad.modelpago.RespuestaResponse;
+import com.serviciudad.models.factura.application.ports.FacturaResponse;
 import com.serviciudad.repository.AuthRepository;
 import com.serviciudad.repository.CronRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -37,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 @Service
+@Slf4j
 public final class FacturaEvertecService {
     @Autowired
     AuthRepository authRepository;
@@ -44,14 +47,15 @@ public final class FacturaEvertecService {
     @Autowired
     CronRepository cronRepository;
 
-    @Autowired
-    private ErrorService errorService;
 
     @Autowired
     private UtilService utilService;
 
     @Autowired
     private Environment env;
+
+    @Value("${url_sicesp}")
+    private String URL_SICESP;
 
     @Value("${url_recaudo}")
     private String URL_RECAUDO;
@@ -78,7 +82,7 @@ public final class FacturaEvertecService {
                                                 facturaResponse.getIdfactura(),
                                                 Constantes.APPROVED);
         } catch (Exception e) {
-            errorService.save(e, "", String.format("Error consultando cuenta por referencia: %s, %s",
+            log.info(String.format("Error consultando cuenta por referencia: %s, %s",
                     facturaResponse.getCuenta(),
                     facturaResponse.getIdfactura()));
             throw e;
@@ -108,7 +112,6 @@ public final class FacturaEvertecService {
                 throw e;
             }
         } catch (Exception e) {
-            errorService.save(e);
             throw e;
         }
 
@@ -169,7 +172,7 @@ public final class FacturaEvertecService {
                 update(authModel);
             }
         } catch (Exception e) {
-            errorService.save(e, "", "Registrando pago de factura");
+            log.error("Registrando pago de factura", e);
             authModel.setError("Registrando pago de factura" + " " + e.getMessage());
 
             update(authModel);
@@ -180,38 +183,22 @@ public final class FacturaEvertecService {
 
     public FacturaResponse consultarFactura(FacturaRequest facturaRequest) {
         FacturaResponse facturaResponse = null;
-        WebClient webClient = WebClient.create(URL_RECAUDO);
-        int limite = 3;
+        WebClient webClient = WebClient.create(URL_SICESP);
 
-        for (int cont = 0; cont < limite; cont++) {
-            try {
-                facturaResponse = webClient.post()
-                        .uri("/rec")
-                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .body(Mono.just(facturaRequest), FacturaRequest.class)
-                        .retrieve()
-                        .bodyToMono(FacturaResponse.class)
-                        .timeout(Duration.ofSeconds(20))  // timeout
-                        .block();
-                break;
-            } catch (Exception e) {
-                errorService.save(e, "", "consultarFactura " + cont + " de " + limite);
-                if (cont + 1 == limite) {
-                    throw e;
-                } else {
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        }
+        facturaResponse = webClient.post()
+                .uri("/api/consultafacturatipo")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(facturaRequest), FacturaRequest.class)
+                .retrieve()
+                .bodyToMono(FacturaResponse.class)
+                .timeout(Duration.ofSeconds(20))  // timeout
+                .block();
 
+        assert facturaResponse != null;
         if (facturaResponse.getFechapago() != null && facturaResponse.getFechapago().length() == 10){
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-            Integer fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
-            Integer fechaActual = Integer.parseInt(dateFormat.format(new Date()));
+            int fechaPago = Integer.parseInt(facturaResponse.getFechapago().replace("-", ""));
+            int fechaActual = Integer.parseInt(dateFormat.format(new Date()));
 
             facturaResponse.setFacturavencida(fechaActual > fechaPago ? "S" : "N");
         } else {
@@ -224,37 +211,20 @@ public final class FacturaEvertecService {
     public PagoResponse consultarEstadoPago(AuthModel authModel) {
         PagoResponse pagoResponse;
         WebClient webClient;
-        String json = "";
 
-        try {
-            webClient = WebClient.create(env.getProperty("url"));
-        } catch (Exception e) {
-            errorService.save(e);
-            throw e;
-        }
+        webClient = WebClient.create(env.getProperty("url"));
+
         AuthRequestInformation authRequestInformation = new AuthRequestInformation(
                 utilService.createAuth());
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            json = mapper.writeValueAsString(authRequestInformation);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            pagoResponse = webClient.post()
-                    .uri("/session/" + authModel.getRequestid())
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(authRequestInformation), ClientRequest.class)
-                    .retrieve()
-                    .bodyToMono(PagoResponse.class)
-                    .timeout(Duration.ofSeconds(20))  // timeout
-                    .block();
-        } catch (Exception e) {
-            errorService.save(e, json, "consultarEstadoPago");
-            throw e;
-        }
+        pagoResponse = webClient.post()
+                .uri("/session/" + authModel.getRequestid())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(authRequestInformation), ClientRequest.class)
+                .retrieve()
+                .bodyToMono(PagoResponse.class)
+                .timeout(Duration.ofSeconds(20))  // timeout
+                .block();
 
         return pagoResponse;
     }
@@ -379,14 +349,11 @@ public final class FacturaEvertecService {
         cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), authModels.size()));
 
         authModels.forEach(authModel -> {
-            try {
-                RespuestaResponse respuestaResponse = pagarFactura(Optional.empty(), true, Optional.of(authModel));
-                if (respuestaResponse.getPagoregistrado().equals("S")) {
-                    cont.getAndIncrement();
-                }
-            } catch (Exception e) {
-                errorService.save(e);
+            RespuestaResponse respuestaResponse = pagarFactura(Optional.empty(), true, Optional.of(authModel));
+            if (respuestaResponse.getPagoregistrado().equals("S")) {
+                cont.getAndIncrement();
             }
+
         });
         cronRepository.save(new CronModel(UUID.randomUUID().toString(), (new Date()).toString(), cont.get()));
         return cont.get();
@@ -482,23 +449,14 @@ public final class FacturaEvertecService {
 
     public String existePagoEnBaseRecaudo(String cuenta, String factura, String codigoBanco) {
         WebClient webClient = WebClient.create(URL_RECAUDO);
-        String existeFactura;
 
-        try {
-            existeFactura = webClient.get()
-                    .uri("/rec/consulta/" + cuenta +"/" + factura + "/" + codigoBanco)
-                    .exchange()
-                    .block()
-                    .bodyToMono(String.class)
-                    .block();
-
-        } catch (Exception e) {
-            errorService.save(e, "", "Consultando existe factura " + factura);
-            throw e;
-        }
-        return existeFactura;
+        return webClient.get()
+                .uri("/rec/consulta/" + cuenta +"/" + factura + "/" + codigoBanco)
+                .exchange()
+                .block()
+                .bodyToMono(String.class)
+                .block();
     }
-
 
     public List<AuthModel> validarFactura(String factura) {
         List<AuthModel> authModel = consultaFactura(factura);

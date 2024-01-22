@@ -2,7 +2,7 @@ package com.serviciudad.controller.factura;
 
 import com.serviciudad.exception.DomainExceptionCuentaNoExiste;
 import com.serviciudad.model.FacturaRequest;
-import com.serviciudad.model.FacturaResponse;
+import com.serviciudad.models.factura.application.ports.FacturaResponse;
 import com.serviciudad.service.FacturaEvertecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
