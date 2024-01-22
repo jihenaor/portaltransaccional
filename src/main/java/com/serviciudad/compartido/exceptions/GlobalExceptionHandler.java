@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.http.HttpTimeoutException;
 
+
 @RestControllerAdvice
 @Log4j2
 public class GlobalExceptionHandler {
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler {
         if (e instanceof BusinessException) {
             errorResponse = new ErrorResponse(e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
-        } else if (e instanceof HttpTimeoutException) {
+        } else if (e.getCause() instanceof HttpTimeoutException) {
             errorResponse = new ErrorResponse(SE_HA_PRODUCIDO_UN_ERROR_EN_EL_SERVIDOR);
             log.error("Error de timeout: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

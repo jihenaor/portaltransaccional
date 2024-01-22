@@ -46,9 +46,9 @@ public final class ConsultaFacturaTipoService {
                 .retrieve()
                 .bodyToMono(FacturaResponse.class)
                 .timeout(Duration.ofSeconds(20))
-                .onErrorMap(ReadTimeoutException.class,
+                .onErrorMap(java.util.concurrent.TimeoutException.class,
                         ex -> new HttpTimeoutException(String.format("Error ReadTimeout api: %s request: %s ",
-                                                    facturaTipoRequest.toString(),
+                                                        facturaTipoRequest,
                                                     URI)
                         ))
                 .block();
