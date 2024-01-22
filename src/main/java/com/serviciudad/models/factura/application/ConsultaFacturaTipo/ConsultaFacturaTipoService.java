@@ -4,6 +4,7 @@ import com.serviciudad.compartido.exceptions.BusinessException;
 import com.serviciudad.model.*;
 import com.serviciudad.models.factura.application.ports.FacturaResponse;
 import com.serviciudad.models.factura.infraestructure.web.adapters.FacturaTipoRequest;
+import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.net.http.HttpTimeoutException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
@@ -43,7 +45,12 @@ public final class ConsultaFacturaTipoService {
                 .body(Mono.just(facturaTipoRequest), FacturaRequest.class)
                 .retrieve()
                 .bodyToMono(FacturaResponse.class)
-                .timeout(Duration.ofSeconds(20))  // timeout
+                .timeout(Duration.ofSeconds(20))
+                .onErrorMap(ReadTimeoutException.class,
+                        ex -> new HttpTimeoutException(String.format("Error ReadTimeout api: %s request: %s ",
+                                                    facturaTipoRequest.toString(),
+                                                    URI)
+                        ))
                 .block();
         return facturaResponse;
     }
