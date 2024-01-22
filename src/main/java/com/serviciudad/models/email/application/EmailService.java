@@ -1,4 +1,4 @@
-package com.serviciudad.models.email;
+package com.serviciudad.models.email.application;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,7 +13,7 @@ public class EmailService {
 
     public void sendSimpleEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("tu_email@ejemplo.com");
+        message.setFrom("jihenaor@gmail.com");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);

@@ -1,8 +1,10 @@
 package com.serviciudad.compartido.exceptions;
 
+import com.serviciudad.models.email.application.EmailService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,9 @@ public class GlobalExceptionHandler {
 
     public static final String SE_HA_PRODUCIDO_UN_ERROR_EN_EL_SERVIDOR = "Se ha producido un error en el servidor.";
 
+    @Autowired
+    private EmailService emailService;
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         ErrorResponse errorResponse;
@@ -28,6 +33,9 @@ public class GlobalExceptionHandler {
         } else if (e.getCause() instanceof HttpTimeoutException) {
             errorResponse = new ErrorResponse(SE_HA_PRODUCIDO_UN_ERROR_EN_EL_SERVIDOR);
             log.error("Error de timeout: {}", e.getMessage(), e);
+            emailService.sendSimpleEmail("jihenaor@gmail.com",
+                                "Error serviciudad",
+                                        "Error de timeout:"+ e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } else if (e instanceof DataIntegrityViolationException) {
             String message = extractConstraintViolationMessage((DataIntegrityViolationException) e);
