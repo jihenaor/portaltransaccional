@@ -34,15 +34,6 @@ public final class UserService {
         }
     }
 
-    public void save(UserModel userModel)  {
-        userModel.setPassword(cifrarPasword(userModel.getPassword()));
-        userRepository.save(userModel);
-    }
-
-    public List<UserModel> findAll()  {
-        return (List<UserModel>) userRepository.findAll();
-    }
-
     public Optional<UserResponse> findByLogin(LoginUser login, PasswordUser password)  {
         Optional<UserModel> userModel = userRepository.findById(login.getValue());
         String passwordCifrado = cifrarPasword(password.getValue());
